@@ -1,0 +1,3373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MTG Commander & Oathbreaker Randomizer | Scryfall Powered</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            title: ['Cinzel', 'serif'],
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            mtgGold: '#e5c158',
+            mtgGoldLight: '#fde68a',
+            mtgDark: '#080a0f',
+            mtgCardBg: '#121620',
+            mtgSurface: '#191f2c',
+            mtgBorder: '#273142',
+            oathPurple: '#9333ea',
+            oathGlow: '#c084fc'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* =========================================================
+       DYNAMIC THEME TOKENS ARCHITECTURE
+       Every token drives colors, surfaces, text, badges, and glows
+       ========================================================= */
+
+    /* 1. Mythic Gold (Default High Fantasy) */
+    :root, [data-theme="mythic"] {
+      --bg-base: #080a0f;
+      --card-bg: #11151f;
+      --card-bg-gradient: linear-gradient(180deg, #131722 0%, #0d1017 100%);
+      --surface-subtle: #090c12;
+      --surface-hover: #19202e;
+      --border-base: #252e3e;
+      --border-highlight: rgba(229, 193, 88, 0.45);
+      --accent-color: #e5c158;
+      --accent-color-hover: #f59e0b;
+      --accent-light: #fef08a;
+      --accent-contrast-text: #080a0f;
+      --accent-glow: 0 0 28px rgba(229, 193, 88, 0.45);
+      --card-glow: 0 20px 45px -10px rgba(0, 0, 0, 0.85), 0 0 25px 2px rgba(229, 193, 88, 0.2);
+      --heading-gradient: linear-gradient(135deg, #fff2cc 0%, #ffd966 35%, #e5c158 70%, #d4a017 100%);
+      --btn-gradient: linear-gradient(135deg, #f59e0b 0%, #eab308 50%, #d97706 100%);
+      --badge-bg: rgba(229, 193, 88, 0.18);
+      --badge-text: #fde047;
+      --badge-border: rgba(229, 193, 88, 0.38);
+      --mesh-1: rgba(147, 51, 234, 0.16);
+      --mesh-2: rgba(229, 193, 88, 0.14);
+      --mesh-3: rgba(14, 104, 171, 0.08);
+      --mesh-4: rgba(211, 32, 42, 0.08);
+    }
+
+    /* 2. Phyrexian Oil (Dark Biomechanical Horror) */
+    [data-theme="phyrexian"] {
+      --bg-base: #050608;
+      --card-bg: #0d0a0f;
+      --card-bg-gradient: linear-gradient(180deg, #130d14 0%, #08060a 100%);
+      --surface-subtle: #080509;
+      --surface-hover: #1c111c;
+      --border-base: #3b1725;
+      --border-highlight: rgba(244, 63, 94, 0.55);
+      --accent-color: #f43f5e;
+      --accent-color-hover: #e11d48;
+      --accent-light: #fecdd3;
+      --accent-contrast-text: #ffffff;
+      --accent-glow: 0 0 32px rgba(244, 63, 94, 0.55);
+      --card-glow: 0 20px 45px -10px rgba(0, 0, 0, 0.9), 0 0 28px 3px rgba(244, 63, 94, 0.35);
+      --heading-gradient: linear-gradient(135deg, #ffe4e6 0%, #fb7185 35%, #f43f5e 70%, #9f1239 100%);
+      --btn-gradient: linear-gradient(135deg, #f43f5e 0%, #e11d48 50%, #881337 100%);
+      --badge-bg: rgba(244, 63, 94, 0.2);
+      --badge-text: #fda4af;
+      --badge-border: rgba(244, 63, 94, 0.45);
+      --mesh-1: rgba(225, 29, 72, 0.26);
+      --mesh-2: rgba(13, 148, 136, 0.18);
+      --mesh-3: rgba(159, 18, 57, 0.15);
+      --mesh-4: rgba(4, 120, 87, 0.12);
+    }
+
+    /* 3. Kamigawa Neon (Cyberpunk Neon Dynasties) */
+    [data-theme="neon"] {
+      --bg-base: #030712;
+      --card-bg: #090e1c;
+      --card-bg-gradient: linear-gradient(180deg, #0e162d 0%, #060914 100%);
+      --surface-subtle: #040813;
+      --surface-hover: #14203d;
+      --border-base: #1e2c48;
+      --border-highlight: rgba(6, 182, 212, 0.65);
+      --accent-color: #06b6d4;
+      --accent-color-hover: #0891b2;
+      --accent-light: #a5f3fc;
+      --accent-contrast-text: #020617;
+      --accent-glow: 0 0 32px rgba(6, 182, 212, 0.65);
+      --card-glow: 0 20px 45px -10px rgba(0, 0, 0, 0.95), 0 0 28px 3px rgba(6, 182, 212, 0.35);
+      --heading-gradient: linear-gradient(135deg, #cffafe 0%, #38bdf8 35%, #06b6d4 70%, #ec4899 100%);
+      --btn-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 50%, #ec4899 100%);
+      --badge-bg: rgba(6, 182, 212, 0.2);
+      --badge-text: #67e8f9;
+      --badge-border: rgba(6, 182, 212, 0.45);
+      --mesh-1: rgba(6, 182, 212, 0.25);
+      --mesh-2: rgba(236, 72, 153, 0.22);
+      --mesh-3: rgba(99, 102, 241, 0.15);
+      --mesh-4: rgba(168, 85, 247, 0.12);
+    }
+
+    /* 4. Urza's Arcane Tome (Burnished Brass & Ancient Parchment) */
+    [data-theme="tome"] {
+      --bg-base: #120e0a;
+      --card-bg: #1c150e;
+      --card-bg-gradient: linear-gradient(180deg, #241b12 0%, #120d08 100%);
+      --surface-subtle: #0f0b07;
+      --surface-hover: #2c2016;
+      --border-base: #422f1c;
+      --border-highlight: rgba(217, 119, 6, 0.6);
+      --accent-color: #d97706;
+      --accent-color-hover: #b45309;
+      --accent-light: #fde68a;
+      --accent-contrast-text: #ffffff;
+      --accent-glow: 0 0 30px rgba(217, 119, 6, 0.55);
+      --card-glow: 0 20px 45px -10px rgba(0, 0, 0, 0.9), 0 0 26px 2px rgba(217, 119, 6, 0.3);
+      --heading-gradient: linear-gradient(135deg, #fef3c7 0%, #fde68a 35%, #d97706 70%, #92400e 100%);
+      --btn-gradient: linear-gradient(135deg, #b45309 0%, #d97706 50%, #78350f 100%);
+      --badge-bg: rgba(217, 119, 6, 0.22);
+      --badge-text: #fcd34d;
+      --badge-border: rgba(217, 119, 6, 0.45);
+      --mesh-1: rgba(180, 83, 9, 0.25);
+      --mesh-2: rgba(120, 53, 15, 0.22);
+      --mesh-3: rgba(146, 64, 14, 0.14);
+      --mesh-4: rgba(194, 65, 12, 0.12);
+    }
+
+    /* =========================================================
+       GLOBAL ELEMENT OVERRIDES DRIVEN BY ACTIVE THEME
+       ========================================================= */
+
+    body {
+      background-color: var(--bg-base) !important;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+
+    /* Dynamic mesh background */
+    .bg-mesh {
+      background-color: var(--bg-base);
+      background-image: 
+        radial-gradient(at 0% 0%, var(--mesh-1) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, var(--mesh-2) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, var(--mesh-3) 0px, transparent 65%),
+        radial-gradient(at 80% 100%, var(--mesh-4) 0px, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    /* Top Navigation Header */
+    header {
+      background-color: var(--card-bg) !important;
+      border-color: var(--border-base) !important;
+    }
+
+    /* Logo Badge and Title */
+    #formatLogoBadge {
+      background: var(--btn-gradient) !important;
+      box-shadow: var(--accent-glow) !important;
+      color: var(--accent-contrast-text) !important;
+    }
+    #formatHeaderTitle,
+    #cardName,
+    #challengeTitle,
+    .gold-foil-text {
+      background: var(--heading-gradient) !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+    }
+
+    /* Primary Summon Button */
+    #randomizeBtn {
+      background: var(--btn-gradient) !important;
+      color: var(--accent-contrast-text) !important;
+      box-shadow: var(--accent-glow) !important;
+      border-color: var(--border-highlight) !important;
+    }
+
+    /* Commander Showcase Container & Major Cards */
+    #commanderShowcase {
+      background: var(--card-bg-gradient) !important;
+      border-color: var(--border-highlight) !important;
+      box-shadow: var(--card-glow) !important;
+    }
+    .card-front, .card-back {
+      border-color: var(--border-highlight) !important;
+    }
+
+    /* Active Challenge Banner */
+    #activeChallengeBanner {
+      background: var(--card-bg-gradient) !important;
+      border-color: var(--border-highlight) !important;
+    }
+    #activeChallengeBanner > div:first-child {
+      background: var(--btn-gradient) !important;
+    }
+    #challengeCategoryBadge {
+      background: var(--badge-bg) !important;
+      color: var(--badge-text) !important;
+      border-color: var(--badge-border) !important;
+    }
+    #challengeCategoryIconWrap {
+      background: var(--badge-bg) !important;
+      border-color: var(--badge-border) !important;
+      color: var(--accent-color) !important;
+    }
+
+    /* Filter Cards and Sidebar Containers */
+    section > div {
+      background: var(--card-bg) !important;
+      border-color: var(--border-base) !important;
+    }
+    #formatInfoBox {
+      background: var(--surface-subtle) !important;
+      border-color: var(--border-base) !important;
+    }
+
+    /* Modals & Drawers */
+    #deckViewerModal > div:nth-child(2),
+    #exportModal > div:nth-child(2),
+    #podModal > div:nth-child(2),
+    #drawer {
+      background: var(--card-bg) !important;
+      border-color: var(--border-highlight) !important;
+    }
+
+    /* Badges & Pills */
+    #rarityPill,
+    #filterFormatTag,
+    #modeCommanderBtn,
+    #deckViewerFormatTag,
+    #exportCardCountLabel {
+      background: var(--badge-bg) !important;
+      color: var(--badge-text) !important;
+      border-color: var(--badge-border) !important;
+    }
+    #cardManaCost {
+      color: var(--accent-light) !important;
+      border-color: var(--border-highlight) !important;
+      background: var(--surface-subtle) !important;
+    }
+    #queryPreview {
+      color: var(--accent-light) !important;
+    }
+
+    /* Active Logic Button */
+    .logic-btn.active-logic,
+    .export-tab.active-tab {
+      background: var(--badge-bg) !important;
+      color: var(--badge-text) !important;
+      border-color: var(--badge-border) !important;
+    }
+
+    /* Deck Build Progress Bar */
+    #deckBuildProgressBar {
+      background: var(--btn-gradient) !important;
+    }
+
+    /* Foil Holographic Card Sheen */
+    .foil-card-wrapper {
+      position: relative;
+      overflow: hidden;
+      border-radius: 1rem;
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+    }
+    .foil-card-wrapper:hover {
+      transform: translateY(-4px) scale(1.015);
+      box-shadow: var(--card-glow);
+    }
+    .foil-card-wrapper::after {
+      content: '';
+      position: absolute;
+      inset: -50%;
+      background: linear-gradient(
+        115deg,
+        transparent 35%,
+        rgba(255, 255, 255, 0.18) 45%,
+        rgba(255, 220, 130, 0.25) 50%,
+        rgba(130, 200, 255, 0.2) 55%,
+        transparent 65%
+      );
+      transform: translateY(-100%);
+      pointer-events: none;
+      transition: transform 0.75s ease;
+    }
+    .foil-card-wrapper:hover::after {
+      transform: translateY(100%);
+    }
+
+    /* Mana Gem Chips */
+    .mana-chip {
+      position: relative;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.08), 0 4px 10px rgba(0,0,0,0.4);
+    }
+    .mana-chip:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px -2px rgba(0,0,0,0.6), inset 0 1px 3px rgba(255,255,255,0.2);
+    }
+    .mana-chip.active {
+      transform: translateY(-3px) scale(1.04);
+    }
+    .mana-chip[data-color="W"].active { box-shadow: 0 0 18px 2px rgba(248, 246, 216, 0.4), inset 0 0 0 2px #fff8db; }
+    .mana-chip[data-color="U"].active { box-shadow: 0 0 18px 2px rgba(14, 104, 171, 0.6), inset 0 0 0 2px #38bdf8; }
+    .mana-chip[data-color="B"].active { box-shadow: 0 0 18px 2px rgba(168, 85, 247, 0.5), inset 0 0 0 2px #c084fc; }
+    .mana-chip[data-color="R"].active { box-shadow: 0 0 18px 2px rgba(211, 32, 42, 0.6), inset 0 0 0 2px #f87171; }
+    .mana-chip[data-color="G"].active { box-shadow: 0 0 18px 2px rgba(0, 115, 62, 0.6), inset 0 0 0 2px #4ade80; }
+    .mana-chip[data-color="C"].active { box-shadow: 0 0 18px 2px rgba(180, 180, 190, 0.5), inset 0 0 0 2px #cbd5e1; }
+
+    /* 3D Card Flip Perspective */
+    .card-perspective {
+      perspective: 1200px;
+    }
+    .card-flipper {
+      transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+      transform-style: preserve-3d;
+    }
+    .card-flipper.flipped {
+      transform: rotateY(180deg);
+    }
+    .card-front, .card-back {
+      backface-visibility: hidden;
+    }
+    .card-back {
+      transform: rotateY(180deg);
+    }
+
+    /* Glow Reveal Animation */
+    @keyframes rollShimmer {
+      0% { opacity: 0.1; transform: scale(0.97) translateY(8px); filter: blur(4px); }
+      60% { opacity: 0.9; transform: scale(1.008) translateY(-2px); filter: blur(0px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+    }
+    .animate-reveal {
+      animation: rollShimmer 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Floating Hover Card Preview Tooltip */
+    #floatingCardTooltip {
+      position: fixed;
+      pointer-events: none;
+      z-index: 100;
+      opacity: 0;
+      transform: scale(0.92);
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.9));
+    }
+    #floatingCardTooltip.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Ornate Scrollbar */
+    ::-webkit-scrollbar { width: 7px; height: 7px; }
+    ::-webkit-scrollbar-track { background: var(--bg-base); }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-base);
+      border-radius: 9999px;
+      border: 1px solid var(--border-highlight);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-color-hover);
+    }
+  </style>
+</head>
+<body class="bg-mtgDark text-slate-200 min-h-screen flex flex-col font-sans bg-mesh selection:bg-amber-400 selection:text-black">
+
+  <header class="border-b border-mtgBorder/80 bg-[#0f121a]/90 backdrop-blur-md sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Brand & Title -->
+      <div class="flex items-center gap-3">
+        <div id="formatLogoBadge" class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 via-yellow-500 to-amber-200 flex items-center justify-center text-black shadow-lg shadow-amber-500/20 transition-all duration-300">
+          <i id="formatLogoIcon" class="fa-solid fa-crown text-lg"></i>
+        </div>
+        <div>
+          <h1 id="formatHeaderTitle" class="text-xl sm:text-2xl font-bold font-title tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-500">
+            COMMANDER COIN
+          </h1>
+          <p id="formatSubtitle" class="text-xs text-slate-400 tracking-wider">Scryfall MTG EDH & Oathbreaker Randomizer</p>
+        </div>
+      </div>
+
+      <!-- Mode Switcher Tabs -->
+      <div class="inline-flex p-1 rounded-xl bg-slate-900 border border-mtgBorder shadow-inner">
+        <button id="modeCommanderBtn" class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide uppercase transition-all bg-gradient-to-r from-amber-500/20 to-yellow-500/20 text-amber-300 border border-amber-500/40 shadow">
+          <i class="fa-solid fa-crown text-amber-400"></i>
+          <span>Commander (EDH)</span>
+        </button>
+        <button id="modeOathbreakerBtn" class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide uppercase text-slate-400 hover:text-slate-200 transition-all">
+          <i class="fa-solid fa-bolt text-purple-400"></i>
+          <span>Oathbreaker</span>
+        </button>
+      </div>
+
+      <!-- Sound toggle, Theme Switcher, Pod & Drawer -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        
+        <!-- Theme Switcher Dropdown Wrapper -->
+        <div id="themeDropdownWrapper" class="relative">
+          <button id="themeToggleBtn" class="px-2.5 py-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-amber-300 border border-mtgBorder text-xs transition flex items-center gap-1.5 shadow" title="Choose Visual Atmosphere">
+            <i class="fa-solid fa-palette text-amber-400"></i>
+            <span id="themeToggleLabel" class="hidden sm:inline font-medium">Mythic Gold</span>
+            <i class="fa-solid fa-chevron-down text-[9px] text-slate-400"></i>
+          </button>
+          <div id="themeMenu" class="hidden absolute right-0 mt-2 w-48 rounded-xl bg-slate-900 border border-mtgBorder shadow-2xl py-1.5 z-50 text-xs backdrop-blur-md">
+            <div class="px-3 py-1 text-[10px] uppercase font-bold text-slate-400 border-b border-mtgBorder/60 mb-1">Visual Themes</div>
+            <button data-theme="mythic" class="theme-option-btn w-full px-3 py-2 text-left flex items-center justify-between hover:bg-slate-800 text-slate-200 transition">
+              <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 shadow"></span> Mythic Gold</span>
+              <i class="fa-solid fa-check text-amber-400 text-xs opacity-0 theme-check"></i>
+            </button>
+            <button data-theme="phyrexian" class="theme-option-btn w-full px-3 py-2 text-left flex items-center justify-between hover:bg-slate-800 text-slate-200 transition">
+              <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 shadow"></span> Phyrexian Oil</span>
+              <i class="fa-solid fa-check text-rose-400 text-xs opacity-0 theme-check"></i>
+            </button>
+            <button data-theme="neon" class="theme-option-btn w-full px-3 py-2 text-left flex items-center justify-between hover:bg-slate-800 text-slate-200 transition">
+              <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow"></span> Kamigawa Neon</span>
+              <i class="fa-solid fa-check text-cyan-400 text-xs opacity-0 theme-check"></i>
+            </button>
+            <button data-theme="tome" class="theme-option-btn w-full px-3 py-2 text-left flex items-center justify-between hover:bg-slate-800 text-slate-200 transition">
+              <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-amber-700 shadow"></span> Urza's Tome</span>
+              <i class="fa-solid fa-check text-amber-600 text-xs opacity-0 theme-check"></i>
+            </button>
+          </div>
+        </div>
+
+        <button id="soundToggleBtn" class="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-amber-400 border border-mtgBorder text-sm transition" title="Toggle Dice Audio">
+          <i id="soundIcon" class="fa-solid fa-volume-high"></i>
+        </button>
+        <button id="podModalTriggerBtn" class="px-3 py-2 rounded-lg bg-gradient-to-r from-indigo-900/80 to-purple-900/80 hover:from-indigo-800 hover:to-purple-800 text-xs font-semibold tracking-wide border border-indigo-500/50 text-indigo-200 transition flex items-center gap-1.5 shadow-sm" title="Generate 2-Player, 3-Player or 4-Player Pod">
+          <i class="fa-solid fa-users text-indigo-400"></i>
+          <span>Pod Generator</span>
+        </button>
+        <button id="viewDeckBtn" class="hidden px-3 py-2 rounded-lg bg-emerald-950/70 hover:bg-emerald-900/80 text-xs font-semibold tracking-wide border border-emerald-500/50 text-emerald-300 transition flex items-center gap-1.5 shadow-sm" title="View Current Deck Breakdown">
+          <i class="fa-solid fa-layer-group text-emerald-400"></i>
+          <span>View Deck (<span id="viewDeckCount">0</span>)</span>
+        </button>
+        <button id="exportModalTriggerBtn" class="px-3 py-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-xs font-semibold tracking-wide border border-mtgBorder text-amber-300 hover:text-amber-200 transition flex items-center gap-1.5 shadow-sm" title="Export Decklist to Moxfield / Archidekt">
+          <i class="fa-solid fa-file-export text-amber-400"></i>
+          <span>Export Deck</span>
+        </button>
+        <button id="drawerToggleBtn" class="px-3.5 py-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-sm font-medium border border-mtgBorder transition flex items-center gap-2">
+          <i class="fa-solid fa-bookmark text-amber-400"></i>
+          <span class="hidden sm:inline">Saved</span>
+          <span id="savedCountBadge" class="text-xs px-1.5 py-0.5 rounded-full bg-slate-700 font-mono">0</span>
+        </button>
+        <a href="https://scryfall.com" target="_blank" rel="noopener" class="text-slate-400 hover:text-amber-400 transition text-sm p-2" title="Powered by Scryfall API">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    
+    <!-- Left Column: Filter Sidebar & Roll Triggers (lg:col-span-4) -->
+    <section class="lg:col-span-4 space-y-6">
+      
+      <!-- Challenge Roulette Configuration Card -->
+      <div class="bg-gradient-to-b from-[#171c28]/95 via-mtgCardBg/95 to-[#0f131c]/95 border border-amber-500/40 rounded-2xl p-5 shadow-2xl backdrop-blur-md relative overflow-hidden group">
+        <div class="absolute -right-12 -top-12 w-36 h-36 bg-amber-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-amber-500/15 transition duration-500"></div>
+        <div class="absolute left-0 top-0 w-full h-[2px] bg-gradient-to-r from-transparent via-amber-400/50 to-transparent"></div>
+
+        <div class="flex items-center justify-between pb-3.5 border-b border-mtgBorder/80">
+          <div class="flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-500/30 to-amber-700/30 text-amber-300 flex items-center justify-center text-xs shadow-inner border border-amber-500/40">
+              <i class="fa-solid fa-dice-d20"></i>
+            </span>
+            <h3 class="font-title text-sm font-bold text-amber-200 tracking-wider uppercase drop-shadow-sm">Deck Roulette</h3>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="challengesEnabledToggle" class="sr-only peer" checked>
+            <div class="w-10 h-5 bg-slate-900 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500 shadow-inner"></div>
+          </label>
+        </div>
+
+        <p class="text-[11px] text-slate-400 mt-3 leading-relaxed">
+          Summon random deckbuilding restrictions (Budget Caps, Mechanical Rules, Flavor & Power Brackets) to challenge your brewing skills.
+        </p>
+
+        <!-- Challenge Quick Toggles -->
+        <div class="grid grid-cols-2 gap-2.5 mt-3.5 text-xs">
+          <label class="flex items-center gap-2 cursor-pointer bg-slate-900/80 p-2.5 rounded-xl border border-mtgBorder/80 hover:border-amber-500/40 hover:bg-slate-800/60 transition shadow-sm">
+            <input type="checkbox" id="catBudget" checked class="rounded bg-slate-950 border-mtgBorder text-amber-500 focus:ring-0">
+            <span class="text-slate-300 text-[11px] font-medium">Budget Caps</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer bg-slate-900/80 p-2.5 rounded-xl border border-mtgBorder/80 hover:border-amber-500/40 hover:bg-slate-800/60 transition shadow-sm">
+            <input type="checkbox" id="catMechanics" checked class="rounded bg-slate-950 border-mtgBorder text-amber-500 focus:ring-0">
+            <span class="text-slate-300 text-[11px] font-medium">Mechanics</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer bg-slate-900/80 p-2.5 rounded-xl border border-mtgBorder/80 hover:border-amber-500/40 hover:bg-slate-800/60 transition shadow-sm">
+            <input type="checkbox" id="catFlavor" checked class="rounded bg-slate-950 border-mtgBorder text-amber-500 focus:ring-0">
+            <span class="text-slate-300 text-[11px] font-medium">Art & Flavor</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer bg-slate-900/80 p-2.5 rounded-xl border border-mtgBorder/80 hover:border-amber-500/40 hover:bg-slate-800/60 transition shadow-sm">
+            <input type="checkbox" id="catBracket" checked class="rounded bg-slate-950 border-mtgBorder text-amber-500 focus:ring-0">
+            <span class="text-slate-300 text-[11px] font-medium">Power Level</span>
+          </label>
+        </div>
+
+        <!-- Lock Challenge & Independent Reroll -->
+        <div class="flex items-center gap-2.5 mt-4 pt-3.5 border-t border-mtgBorder/70">
+          <button id="rerollChallengeBtn" class="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-700 hover:to-slate-800 text-[11px] font-semibold text-amber-300 border border-amber-500/30 transition flex items-center justify-center gap-2 shadow">
+            <i class="fa-solid fa-shuffle text-amber-400"></i>
+            <span>Roll New Challenge</span>
+          </button>
+          <button id="lockChallengeBtn" class="py-2 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-[11px] font-medium text-slate-300 hover:text-white border border-mtgBorder transition flex items-center gap-1.5 shadow" title="Lock current challenge across rolls">
+            <i id="lockChallengeIcon" class="fa-solid fa-lock-open"></i>
+            <span id="lockChallengeText">Unlock</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-gradient-to-b from-mtgCardBg/95 to-[#0d1017]/95 border border-mtgBorder/90 rounded-2xl p-5 shadow-2xl backdrop-blur-md relative">
+        <div class="absolute left-0 top-0 w-full h-[1px] bg-gradient-to-r from-transparent via-slate-400/30 to-transparent"></div>
+        
+        <div class="flex items-center justify-between pb-3.5 border-b border-mtgBorder/80">
+          <div class="flex items-center gap-2">
+            <span id="filterFormatTag" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30 shadow-inner">
+              Commander Mode
+            </span>
+            <h2 class="font-title text-sm text-slate-200 tracking-wider font-semibold">Filters</h2>
+          </div>
+          <button id="resetFiltersBtn" class="text-xs text-slate-400 hover:text-amber-300 transition hover:underline">
+            Reset All
+          </button>
+        </div>
+
+        <!-- Color Symbol Filter Selection -->
+        <div class="mt-4">
+          <label class="block text-xs font-semibold text-slate-300 tracking-wide uppercase mb-2">Color Inclusions</label>
+          <div class="grid grid-cols-6 gap-2" id="manaSymbolsContainer">
+            <button data-color="W" class="mana-chip py-2.5 rounded-xl flex flex-col items-center justify-center border border-mtgBorder bg-slate-950/70 hover:bg-slate-900 transition">
+              <span class="w-7 h-7 rounded-full bg-[#f8f6d8] text-amber-950 font-black text-xs flex items-center justify-center shadow-md">W</span>
+              <span class="text-[10px] text-slate-400 mt-1 font-medium">White</span>
+            </button>
+            <button data-color="U" class="mana-chip py-2.5 rounded-xl flex flex-col items-center justify-center border border-mtgBorder bg-slate-950/70 hover:bg-slate-900 transition">
+              <span class="w-7 h-7 rounded-full bg-[#0e68ab] text-white font-black text-xs flex items-center justify-center shadow-md">U</span>
+              <span class="text-[10px] text-slate-400 mt-1 font-medium">Blue</span>
+            </button>
+            <button data-color="B" class="mana-chip py-2.5 rounded-xl flex flex-col items-center justify-center border border-mtgBorder bg-slate-950/70 hover:bg-slate-900 transition">
+              <span class="w-7 h-7 rounded-full bg-[#26202b] text-slate-300 border border-slate-700 font-black text-xs flex items-center justify-center shadow-md">B</span>
+              <span class="text-[10px] text-slate-400 mt-1 font-medium">Black</span>
+            </button>
+            <button data-color="R" class="mana-chip py-2.5 rounded-xl flex flex-col items-center justify-center border border-mtgBorder bg-slate-950/70 hover:bg-slate-900 transition">
+              <span class="w-7 h-7 rounded-full bg-[#d3202a] text-white font-black text-xs flex items-center justify-center shadow-md">R</span>
+              <span class="text-[10px] text-slate-400 mt-1 font-medium">Red</span>
+            </button>
+            <button data-color="G" class="mana-chip py-2.5 rounded-xl flex flex-col items-center justify-center border border-mtgBorder bg-slate-950/70 hover:bg-slate-900 transition">
+              <span class="w-7 h-7 rounded-full bg-[#00733e] text-white font-black text-xs flex items-center justify-center shadow-md">G</span>
+              <span class="text-[10px] text-slate-400 mt-1 font-medium">Green</span>
+            </button>
+            <button data-color="C" class="mana-chip py-2.5 rounded-xl flex flex-col items-center justify-center border border-mtgBorder bg-slate-950/70 hover:bg-slate-900 transition">
+              <span class="w-7 h-7 rounded-full bg-[#7d7d82] text-white font-black text-xs flex items-center justify-center shadow-md">C</span>
+              <span class="text-[10px] text-slate-400 mt-1 font-medium">None</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Color Logic Match (Exact vs At Most vs At Least) -->
+        <div class="mt-4">
+          <label class="block text-xs font-semibold text-slate-300 tracking-wide uppercase mb-1.5">Color Logic</label>
+          <div class="grid grid-cols-3 gap-1.5 bg-slate-900/80 p-1 rounded-xl border border-mtgBorder text-xs">
+            <button data-logic="exact" class="logic-btn active-logic py-1.5 rounded-lg font-medium text-center transition bg-amber-500/20 text-amber-300 border border-amber-500/30">Exact (=)</button>
+            <button data-logic="atmost" class="logic-btn py-1.5 rounded-lg font-medium text-center transition text-slate-400 hover:text-slate-200">Subset (≤)</button>
+            <button data-logic="atleast" class="logic-btn py-1.5 rounded-lg font-medium text-center transition text-slate-400 hover:text-slate-200">Includes (≥)</button>
+          </div>
+        </div>
+
+        <!-- Color Count Preset -->
+        <div class="mt-4">
+          <label class="block text-xs font-semibold text-slate-300 tracking-wide uppercase mb-1.5">Color Count Preset</label>
+          <select id="colorCountFilter" class="w-full bg-slate-900/90 border border-mtgBorder rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-400">
+            <option value="any">Any Color Count</option>
+            <option value="0">Colorless (0-Color)</option>
+            <option value="1">Mono-Color (1-Color)</option>
+            <option value="2">Guild / Dual (2-Color)</option>
+            <option value="3">Shard / Wedge (3-Color)</option>
+            <option value="4">4-Color (Nephilim)</option>
+            <option value="5">5-Color (WUBRG)</option>
+          </select>
+        </div>
+
+        <!-- Commander-Specific Filter: Card Types -->
+        <div id="commanderTypeContainer" class="mt-4">
+          <label class="block text-xs font-semibold text-slate-300 tracking-wide uppercase mb-1.5">Commander Card Type</label>
+          <select id="commanderTypeFilter" class="w-full bg-slate-900/90 border border-mtgBorder rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-400">
+            <option value="any">Any Legal Commander</option>
+            <option value="creature">Legendary Creature</option>
+            <option value="planeswalker">Legal Planeswalker</option>
+            <option value="partner">Has Partner / Friends Forever</option>
+            <option value="background">Choose a Background</option>
+          </select>
+        </div>
+
+        <!-- Oathbreaker Spell Type Filter -->
+        <div id="oathbreakerSpellContainer" class="mt-4 hidden">
+          <label class="block text-xs font-semibold text-purple-300 tracking-wide uppercase mb-1.5">Signature Spell Type</label>
+          <select id="spellTypeFilter" class="w-full bg-slate-900/90 border border-mtgBorder rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-purple-400">
+            <option value="any">Any (Instant or Sorcery)</option>
+            <option value="instant">Instant Only</option>
+            <option value="sorcery">Sorcery Only</option>
+          </select>
+        </div>
+
+        <!-- Format & Toggles -->
+        <div class="mt-4 pt-3 border-t border-mtgBorder/60 space-y-2.5">
+          <label class="flex items-center gap-2.5 cursor-pointer text-xs text-slate-300 select-none">
+            <input type="checkbox" id="budgetFilter" class="rounded bg-slate-900 border-mtgBorder text-amber-500 focus:ring-0">
+            <span>Budget Friendly (Under $5.00)</span>
+          </label>
+          <label class="flex items-center gap-2.5 cursor-pointer text-xs text-slate-300 select-none">
+            <input type="checkbox" id="excludeUnsets" checked class="rounded bg-slate-900 border-mtgBorder text-amber-500 focus:ring-0">
+            <span>Exclude Un-sets / Silver-Bordered</span>
+          </label>
+        </div>
+
+        <!-- Real-Time Scryfall Query Preview -->
+        <div class="mt-4 p-2.5 rounded-lg bg-black/50 border border-mtgBorder/60 font-mono text-[11px] text-amber-300/80 break-all leading-tight">
+          <span class="text-slate-500">Query: </span><span id="queryPreview">is:commander</span>
+        </div>
+
+        <!-- Primary Action Summon Button -->
+        <button id="randomizeBtn" class="mt-5 w-full py-4 px-4 rounded-xl font-black text-base tracking-wider uppercase font-title active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2.5 group">
+          <i id="randomizeBtnIcon" class="fa-solid fa-dice-d20 text-xl group-hover:rotate-90 transition-transform duration-500"></i>
+          <span id="randomizeBtnText" class="tracking-widest">Summon Commander</span>
+        </button>
+
+        <!-- Oathbreaker Sub-Buttons (Roll PW vs Roll Spell) -->
+        <div id="oathbreakerRerollGroup" class="hidden grid-cols-2 gap-2 mt-2.5">
+          <button id="rerollOathbreakerOnlyBtn" class="py-2.5 px-3 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-purple-500/40 text-xs text-purple-300 font-semibold transition flex items-center justify-center gap-1.5 shadow">
+            <i class="fa-solid fa-arrows-rotate text-purple-400"></i> Roll Planeswalker
+          </button>
+          <button id="rerollSpellOnlyBtn" class="py-2.5 px-3 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-cyan-500/40 text-xs text-cyan-300 font-semibold transition flex items-center justify-center gap-1.5 shadow">
+            <i class="fa-solid fa-wand-magic-sparkles text-cyan-400"></i> Roll Spell Only
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Format Rules Helper Card -->
+      <div id="formatInfoBox" class="p-4 rounded-2xl border text-xs text-slate-400 leading-relaxed">
+        <p class="flex items-center gap-2 font-medium text-amber-300 mb-1">
+          <i class="fa-solid fa-circle-info"></i> Commander (EDH) Rules
+        </p>
+        Requires a 100-card singleton deck led by a Legendary Creature (or specific Planeswalker). Color identity guides all 99 deck cards.
+      </div>
+    </section>
+
+    <section class="lg:col-span-8 space-y-6">
+      
+      <!-- Challenge Active Display Banner -->
+      <div id="activeChallengeBanner" class="border rounded-2xl p-5 shadow-2xl relative overflow-hidden transition-all backdrop-blur-md">
+        <div class="absolute left-0 top-0 bottom-0 w-1.5"></div>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="flex items-start gap-4">
+            <div id="challengeCategoryIconWrap" class="w-12 h-12 rounded-2xl flex items-center justify-center text-lg shrink-0 mt-0.5 shadow-lg">
+              <i id="challengeCategoryIcon" class="fa-solid fa-sack-dollar"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span id="challengeCategoryBadge" class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full">
+                  Budget Challenge
+                </span>
+                <span id="challengeDifficultyBadge" class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                  Difficulty: Medium
+                </span>
+              </div>
+              <h4 id="challengeTitle" class="text-base sm:text-xl font-bold font-title mt-1">
+                Budget Under $50
+              </h4>
+              <p id="challengeDescription" class="text-xs text-slate-300 mt-1 leading-relaxed max-w-xl">
+                The total value of your 99 cards (excluding Commander) must not exceed $50 USD based on market prices.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 self-end sm:self-center shrink-0">
+            <button id="quickRerollChallengeBtn" class="px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-xs text-amber-300 hover:text-amber-200 border border-amber-500/40 transition flex items-center gap-1.5 shadow" title="Spin Roulette">
+              <i class="fa-solid fa-arrows-rotate"></i>
+              <span>Reroll Challenge</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading Skeleton State -->
+      <div id="loadingState" class="hidden animate-pulse bg-mtgCardBg/80 border border-mtgBorder rounded-2xl p-6 sm:p-8">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+          <div class="md:col-span-5 h-[420px] bg-slate-800/60 rounded-2xl"></div>
+          <div class="md:col-span-7 space-y-4">
+            <div class="h-8 bg-slate-800/80 rounded-lg w-3/4"></div>
+            <div class="h-4 bg-slate-800/60 rounded-md w-1/2"></div>
+            <div class="h-24 bg-slate-800/40 rounded-xl w-full"></div>
+            <div class="h-10 bg-slate-800/60 rounded-xl w-1/3"></div>
+          </div>
+        </div>
+        <p class="text-center text-xs tracking-widest text-amber-400/80 uppercase mt-6 font-mono">
+          <i class="fa-solid fa-spinner fa-spin mr-2"></i>Searching the Multiverse...
+        </p>
+      </div>
+
+      <!-- Error State Card -->
+      <div id="errorState" class="hidden bg-rose-950/30 border border-rose-500/40 rounded-2xl p-6 sm:p-8 text-center">
+        <div class="w-14 h-14 mx-auto rounded-full bg-rose-900/40 border border-rose-500/50 flex items-center justify-center text-rose-300 text-2xl mb-4">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h3 class="text-lg font-bold text-rose-200 font-title mb-2">No Match Found</h3>
+        <p id="errorMessage" class="text-slate-300 text-sm max-w-md mx-auto mb-5 leading-relaxed">
+          No cards matched your exact filter combination. Try broadening your colors or switching to subset mode.
+        </p>
+        <button id="retryBroadBtn" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-semibold border border-mtgBorder transition">
+          Clear Strict Filters & Roll
+        </button>
+      </div>
+
+      <!-- MAIN DISPLAY: COMMANDER SHOWCASE (Single Large Card Layout) -->
+      <div id="commanderShowcase" class="border rounded-3xl p-6 sm:p-8 shadow-2xl relative transition-all backdrop-blur-md">
+        <div class="absolute left-0 top-0 w-full h-[1px] bg-gradient-to-r from-transparent via-amber-400/40 to-transparent"></div>
+        
+        <div class="flex items-center justify-between pb-4 mb-6 border-b border-mtgBorder/80">
+          <div class="flex items-center gap-2.5">
+            <span id="rarityPill" class="text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-inner">
+              Mythic Rare
+            </span>
+            <span id="setInfoPill" class="text-xs text-slate-400 font-mono hidden sm:inline-block">
+              SET: CMR #001
+            </span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button id="toggleFavoriteBtn" class="p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-mtgBorder text-slate-300 hover:text-amber-400 transition shadow" title="Save to Favorites">
+              <i class="fa-regular fa-star text-base"></i>
+            </button>
+            <button id="copyShareBtn" class="p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-mtgBorder text-slate-300 hover:text-white transition shadow" title="Copy Card Name & Link">
+              <i class="fa-regular fa-copy text-base"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+          
+          <!-- Card Image Section with 3D Flip & Holographic Foil Sheen -->
+          <div class="md:col-span-5 flex flex-col items-center">
+            <div class="card-perspective w-full max-w-[320px] aspect-[5/7] relative cursor-pointer foil-card-wrapper" id="cardImageContainer" title="Click to flip double-faced card">
+              <div id="flipper" class="card-flipper w-full h-full relative">
+                <div class="card-front absolute inset-0 rounded-2xl overflow-hidden shadow-2xl border bg-slate-950">
+                  <img id="cardImgFront" src="" alt="Commander Front" class="w-full h-full object-cover">
+                </div>
+                <div class="card-back absolute inset-0 rounded-2xl overflow-hidden shadow-2xl border bg-slate-950">
+                  <img id="cardImgBack" src="" alt="Commander Back" class="w-full h-full object-cover">
+                </div>
+              </div>
+            </div>
+
+            <button id="flipBtn" class="mt-4 hidden px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-amber-500/40 text-xs text-amber-300 font-semibold transition items-center gap-2 shadow">
+              <i class="fa-solid fa-arrows-rotate"></i>
+              <span>Transform / Flip Card</span>
+            </button>
+          </div>
+
+          <!-- Card Details Content -->
+          <div class="md:col-span-7 flex flex-col justify-between space-y-4">
+            <div>
+              <div class="flex flex-wrap items-baseline justify-between gap-2">
+                <h3 id="cardName" class="text-2xl sm:text-3xl font-black font-title tracking-wide drop-shadow-md">
+                  Card Name
+                </h3>
+                <div id="cardManaCost" class="text-base sm:text-lg font-mono font-bold tracking-wider px-2.5 py-1 rounded-lg border shadow-inner"></div>
+              </div>
+
+              <p id="cardTypeLine" class="text-sm font-semibold text-slate-300 mt-1.5">
+                Legendary Creature — Human Warrior
+              </p>
+
+              <div class="mt-3.5 flex items-center gap-2" id="colorIdentityBadges"></div>
+
+              <div class="mt-4 p-4 rounded-2xl bg-slate-950/80 border border-mtgBorder/90 text-slate-200 text-sm leading-relaxed whitespace-pre-wrap font-sans shadow-inner" id="cardOracleText"></div>
+
+              <div class="mt-3.5 flex items-center justify-between text-sm">
+                <div id="cardStats" class="font-title font-bold text-amber-200 text-base"></div>
+                <div id="cardArtist" class="text-xs text-slate-400 italic"></div>
+              </div>
+            </div>
+
+            <!-- External Links & Prices -->
+            <div class="pt-4 border-t border-mtgBorder/80 space-y-3.5">
+              <div class="flex items-center justify-between text-xs sm:text-sm">
+                <span class="text-slate-400 font-medium">Market Price:</span>
+                <span id="cardPrice" class="font-mono font-extrabold text-emerald-400 text-base bg-emerald-950/40 px-2.5 py-0.5 rounded-lg border border-emerald-500/30">$0.00 USD</span>
+              </div>
+
+              <!-- Auto-Generate Deck Action for Commander -->
+              <div class="pt-1">
+                <button id="generateDeckCommanderBtn" class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-400 text-white font-black text-sm tracking-widest uppercase font-title shadow-xl shadow-emerald-950/60 active:scale-[0.99] transition flex items-center justify-center gap-2.5 border border-emerald-400/50">
+                  <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
+                  <span id="generateDeckCommanderText">Auto-Build Deck (100 Cards)</span>
+                </button>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 pt-1">
+                <a id="scryfallLink" href="#" target="_blank" rel="noopener" class="py-2.5 px-3 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-mtgBorder text-xs text-center font-semibold text-slate-200 transition flex items-center justify-center gap-2 shadow">
+                  <i class="fa-solid fa-magnifying-glass text-amber-400"></i> Scryfall Page
+                </a>
+                <a id="edhrecLink" href="#" target="_blank" rel="noopener" class="py-2.5 px-3 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-mtgBorder text-xs text-center font-semibold text-slate-200 transition flex items-center justify-center gap-2 shadow">
+                  <i class="fa-solid fa-chart-line text-blue-400"></i> EDHREC Synergy
+                </a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- OATHBREAKER SHOWCASE: DUAL CARD LAYOUT -->
+      <div id="oathbreakerShowcase" class="hidden bg-mtgCardBg/90 border border-purple-500/30 rounded-2xl p-5 sm:p-7 shadow-2xl relative transition-all">
+        <div class="flex items-center justify-between pb-4 mb-5 border-b border-mtgBorder">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-purple-500/20 text-purple-300 border border-purple-500/30">
+              Oathbreaker Pair
+            </span>
+            <span id="oathIdentityPill" class="text-xs text-slate-400 font-mono">
+              Identity: Colorless
+            </span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button id="toggleFavoriteOathBtn" class="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-mtgBorder text-slate-300 hover:text-purple-400 transition" title="Save Pair to Favorites">
+              <i class="fa-regular fa-star text-base"></i>
+            </button>
+            <button id="copyShareOathBtn" class="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-mtgBorder text-slate-300 hover:text-white transition" title="Copy Pair Details">
+              <i class="fa-regular fa-copy text-base"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Auto-Build Oathbreaker Button Banner -->
+        <div class="mb-5">
+          <button id="generateDeckOathBtn" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-purple-700 via-fuchsia-600 to-indigo-600 hover:from-purple-600 hover:to-fuchsia-500 text-white font-bold text-sm tracking-wider uppercase font-title shadow-lg shadow-purple-900/40 active:scale-[0.99] transition flex items-center justify-center gap-2 border border-purple-400/40">
+            <i class="fa-solid fa-wand-magic-sparkles text-cyan-300"></i>
+            <span id="generateDeckOathText">Auto-Build Deck (60 Cards)</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Card 1: Oathbreaker -->
+          <div class="bg-slate-900/70 border border-purple-500/30 rounded-xl p-4 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
+                  <i class="fa-solid fa-person-sparkles"></i> Oathbreaker
+                </span>
+                <span id="pwManaCost" class="text-xs font-mono font-bold text-purple-300"></span>
+              </div>
+              <div class="w-full max-w-[240px] aspect-[5/7] mx-auto rounded-xl overflow-hidden shadow-2xl border border-slate-700/60 mb-3 bg-slate-950">
+                <img id="pwImg" src="" alt="Planeswalker Card" class="w-full h-full object-cover">
+              </div>
+              <h4 id="pwName" class="font-title font-bold text-base text-purple-100 truncate">Planeswalker Name</h4>
+              <p id="pwType" class="text-xs text-slate-400 mb-2 truncate">Legendary Planeswalker</p>
+              <div class="p-3 rounded-lg bg-slate-950/70 border border-mtgBorder text-xs text-slate-300 whitespace-pre-wrap max-h-36 overflow-y-auto" id="pwOracle"></div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-mtgBorder flex items-center justify-between text-xs">
+              <span id="pwLoyalty" class="font-title font-bold text-purple-300">Loyalty: 4</span>
+              <div class="flex items-center gap-2">
+                <a id="pwScryfallLink" href="#" target="_blank" rel="noopener" class="text-slate-400 hover:text-purple-300">Scryfall <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a>
+                <a id="pwOathLink" href="#" target="_blank" rel="noopener" class="text-purple-400 hover:text-purple-300">Oathbreaker.gg <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Signature Spell -->
+          <div class="bg-slate-900/70 border border-cyan-500/30 rounded-xl p-4 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> Signature Spell
+                </span>
+                <span id="spellManaCost" class="text-xs font-mono font-bold text-cyan-300"></span>
+              </div>
+              <div class="w-full max-w-[240px] aspect-[5/7] mx-auto rounded-xl overflow-hidden shadow-2xl border border-slate-700/60 mb-3 bg-slate-950">
+                <img id="spellImg" src="" alt="Signature Spell Card" class="w-full h-full object-cover">
+              </div>
+              <h4 id="spellName" class="font-title font-bold text-base text-cyan-100 truncate">Spell Name</h4>
+              <p id="spellType" class="text-xs text-slate-400 mb-2 truncate">Instant / Sorcery</p>
+              <div class="p-3 rounded-lg bg-slate-950/70 border border-mtgBorder text-xs text-slate-300 whitespace-pre-wrap max-h-36 overflow-y-auto" id="spellOracle"></div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-mtgBorder flex items-center justify-between text-xs">
+              <span id="spellPrice" class="font-mono text-emerald-400">$0.00 USD</span>
+              <div class="flex items-center gap-2">
+                <a id="spellScryfallLink" href="#" target="_blank" rel="noopener" class="text-slate-400 hover:text-cyan-300">Scryfall <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a>
+                <a id="spellEdhrecLink" href="#" target="_blank" rel="noopener" class="text-cyan-400 hover:text-cyan-300">EDHREC <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <aside id="drawer" class="fixed inset-y-0 right-0 w-full sm:w-96 border-l shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col backdrop-blur-md">
+    <div class="p-4 border-b border-mtgBorder flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-scroll text-amber-400"></i>
+        <h3 class="font-title font-bold text-amber-100">Saved Deck Archive</h3>
+      </div>
+      <button id="closeDrawerBtn" class="text-slate-400 hover:text-white p-2 rounded-lg">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+
+    <!-- Drawer Tabs -->
+    <div class="flex border-b border-mtgBorder bg-slate-900/60 text-xs font-semibold">
+      <button id="tabFavorites" class="flex-1 py-3 text-center border-b-2 border-amber-400 text-amber-300">
+        Favorites (<span id="favTabCount">0</span>)
+      </button>
+      <button id="tabHistory" class="flex-1 py-3 text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200">
+        Recent Rolls (<span id="histTabCount">0</span>)
+      </button>
+    </div>
+
+    <!-- Scrollable Items List -->
+    <div id="drawerListContainer" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+
+    <!-- Drawer Footer Actions -->
+    <div class="p-4 border-t border-mtgBorder bg-slate-950/70 flex gap-2">
+      <button id="clearListBtn" class="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 font-medium transition">
+        Clear Current Tab
+      </button>
+    </div>
+  </aside>
+
+  <!-- Drawer Backdrop Overlay -->
+  <div id="drawerBackdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden transition-opacity"></div>
+
+  <!-- FULL DECK VIEWER & BUILDER PROGRESS MODAL -->
+  <div id="deckViewerModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 hidden">
+    <div id="deckViewerBackdrop" class="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity"></div>
+    <div class="border rounded-2xl max-w-5xl w-full p-4 sm:p-6 relative z-10 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
+      
+      <!-- Modal Header -->
+      <div class="flex flex-wrap items-center justify-between pb-4 border-b border-mtgBorder/80 gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-hat-wizard"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 id="deckViewerTitle" class="font-title text-base sm:text-xl font-bold text-amber-100">Deck Synthesis Engine</h3>
+              <span id="deckViewerFormatTag" class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded">EDH (100)</span>
+            </div>
+            <p id="deckViewerSubtitle" class="text-xs text-slate-400 mt-0.5">Synthesizing cards adhering to challenge constraints</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="deckViewerExportBtn" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 text-xs font-bold uppercase tracking-wider transition flex items-center gap-1.5 shadow-md">
+            <i class="fa-solid fa-file-export"></i>
+            <span>Export to Archidekt</span>
+          </button>
+          <button id="closeDeckViewerBtn" class="text-slate-400 hover:text-white p-2 rounded-lg">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Synthesis Progress Bar -->
+      <div id="deckBuildProgressBarContainer" class="my-3 hidden">
+        <div class="flex items-center justify-between text-xs mb-1">
+          <span id="deckBuildStatusText" class="text-amber-300 font-mono">Querying Scryfall for Ramp & Synergy...</span>
+          <span id="deckBuildPercentText" class="text-slate-400 font-mono">0%</span>
+        </div>
+        <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-mtgBorder">
+          <div id="deckBuildProgressBar" class="h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- Synthesis Stats Dashboard -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 my-3 text-xs">
+        <div class="bg-slate-900/80 p-2.5 rounded-xl border border-mtgBorder/70">
+          <span class="text-slate-400 text-[11px] block">Total Cards</span>
+          <span id="statTotalCards" class="font-title font-bold text-amber-200 text-base">0</span>
+        </div>
+        <div class="bg-slate-900/80 p-2.5 rounded-xl border border-mtgBorder/70">
+          <span class="text-slate-400 text-[11px] block">Estimated Cost</span>
+          <span id="statTotalCost" class="font-mono font-bold text-emerald-400 text-base">$0.00</span>
+        </div>
+        <div class="bg-slate-900/80 p-2.5 rounded-xl border border-mtgBorder/70">
+          <span class="text-slate-400 text-[11px] block">Avg Mana Value</span>
+          <span id="statAvgCmc" class="font-mono font-bold text-cyan-300 text-base">0.00</span>
+        </div>
+        <div class="bg-slate-900/80 p-2.5 rounded-xl border border-mtgBorder/70">
+          <span class="text-slate-400 text-[11px] block">Detected Archetype</span>
+          <span id="statArchetype" class="font-semibold text-purple-300 text-xs truncate">Midrange / Goodstuff</span>
+        </div>
+      </div>
+
+      <!-- Live Challenge Compliance Bar & Auto-Fix -->
+      <div id="deckChallengeComplianceBar" class="p-3 rounded-xl border flex flex-wrap items-center justify-between gap-2.5 text-xs my-2 bg-slate-950/70 border-mtgBorder/70 transition-all">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span id="challengeComplianceIcon" class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+            <i class="fa-solid fa-check"></i>
+          </span>
+          <div class="truncate">
+            <span id="challengeComplianceTitle" class="font-semibold text-slate-200 block">Challenge Verification</span>
+            <span id="challengeComplianceDetails" class="text-slate-400 text-[11px]">Validating against active Roulette parameters...</span>
+          </div>
+        </div>
+        <button id="autoFixNonCompliantBtn" class="hidden px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-medium transition items-center gap-1.5 shadow-sm">
+          <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
+          <span>Auto-Fix Non-Compliant (<span id="autoFixCount">0</span>)</span>
+        </button>
+      </div>
+
+      <!-- Mana Curve Distribution Chart -->
+      <div class="bg-slate-950/70 p-3 rounded-xl border border-mtgBorder/60 my-2">
+        <div class="flex items-center justify-between text-[11px] font-semibold text-slate-300 uppercase tracking-wide mb-2">
+          <span>Mana Curve (Excluding Lands)</span>
+          <span class="text-slate-500 font-mono">CMC 0 to 7+</span>
+        </div>
+        <div id="manaCurveChart" class="flex items-end gap-2 sm:gap-4 h-16 pt-2 px-1"></div>
+      </div>
+
+      <!-- Category Filter Tabs & Card Search -->
+      <div class="flex flex-wrap items-center justify-between gap-2 my-2 pt-2 border-t border-mtgBorder/50">
+        <div id="categoryTabList" class="flex flex-wrap items-center gap-1.5 text-xs">
+          <button data-cat="all" class="deck-cat-btn px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 font-medium">All (<span id="catCountAll">0</span>)</button>
+          <button data-cat="Commander" class="deck-cat-btn px-2.5 py-1 rounded-lg bg-slate-900 text-slate-300 border border-mtgBorder font-medium">Commander (<span id="catCountCmdr">0</span>)</button>
+          <button data-cat="Creatures" class="deck-cat-btn px-2.5 py-1 rounded-lg bg-slate-900 text-slate-300 border border-mtgBorder font-medium">Creatures (<span id="catCountCreatures">0</span>)</button>
+          <button data-cat="Spells" class="deck-cat-btn px-2.5 py-1 rounded-lg bg-slate-900 text-slate-300 border border-mtgBorder font-medium">Instants & Sorceries (<span id="catCountSpells">0</span>)</button>
+          <button data-cat="Permanents" class="deck-cat-btn px-2.5 py-1 rounded-lg bg-slate-900 text-slate-300 border border-mtgBorder font-medium">Artifacts & Enchants (<span id="catCountPerms">0</span>)</button>
+          <button data-cat="Lands" class="deck-cat-btn px-2.5 py-1 rounded-lg bg-slate-900 text-slate-300 border border-mtgBorder font-medium">Lands (<span id="catCountLands">0</span>)</button>
+        </div>
+
+        <div class="relative text-xs w-full sm:w-48">
+          <input type="text" id="deckCardSearch" placeholder="Filter card..." class="w-full bg-slate-900 border border-mtgBorder rounded-lg px-2.5 py-1 text-slate-200 focus:outline-none focus:border-amber-400">
+        </div>
+      </div>
+
+      <!-- Main Decklist Scrollable Table -->
+      <div id="deckCardsScrollArea" class="flex-1 overflow-y-auto pr-1 my-2 divide-y divide-mtgBorder/40 border border-mtgBorder/60 rounded-xl bg-slate-900/50"></div>
+
+      <!-- Modal Footer -->
+      <div class="pt-3 border-t border-mtgBorder flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="text-slate-400 flex items-center gap-2">
+          <i class="fa-solid fa-circle-check text-emerald-400"></i>
+          <span id="deckLegalityNotice">Deck verified against Scryfall card pool.</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="rebuildCurrentDeckBtn" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-mtgBorder transition flex items-center gap-1.5">
+            <i class="fa-solid fa-arrows-rotate"></i>
+            <span>Re-Generate Deck</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- DECK EXPORT MODAL -->
+  <div id="exportModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div id="exportModalBackdrop" class="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity"></div>
+    <div class="border rounded-2xl max-w-2xl w-full p-6 relative z-10 shadow-2xl flex flex-col max-h-[90vh]">
+      
+      <div class="flex items-center justify-between pb-4 border-b border-mtgBorder">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-sm">
+            <i class="fa-solid fa-file-export"></i>
+          </div>
+          <div>
+            <h3 class="font-title text-lg font-bold text-amber-100">Export Decklist to Archidekt & Moxfield</h3>
+            <p class="text-xs text-slate-400">Clean, syntax-safe format for deckbuilders</p>
+          </div>
+        </div>
+        <button id="closeExportModalBtn" class="text-slate-400 hover:text-white p-2 rounded-lg">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Format Switcher & Options -->
+      <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
+        <div class="inline-flex p-1 rounded-xl bg-slate-900 border border-mtgBorder text-xs">
+          <button data-format="archidekt" class="export-tab active-tab px-3 py-1.5 rounded-lg font-semibold transition">
+            Archidekt (Clean)
+          </button>
+          <button data-format="moxfield" class="export-tab px-3 py-1.5 rounded-lg font-medium transition text-slate-400 hover:text-slate-200">
+            Moxfield
+          </button>
+          <button data-format="plain" class="export-tab px-3 py-1.5 rounded-lg font-medium transition text-slate-400 hover:text-slate-200">
+            Plain Text / MTGO
+          </button>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer select-none">
+            <input type="checkbox" id="cleanExportToggle" checked class="rounded bg-slate-900 border-mtgBorder text-amber-500 focus:ring-0">
+            <span>Clean Text Format</span>
+          </label>
+          <span id="exportCardCountLabel" class="text-xs font-mono px-2 py-0.5 rounded border">100 Cards</span>
+        </div>
+      </div>
+
+      <!-- Export Decklist Textarea -->
+      <div class="mt-3 flex-1 min-h-[220px]">
+        <textarea id="exportDeckTextarea" readonly class="w-full h-56 bg-slate-950 border border-mtgBorder rounded-xl p-3 font-mono text-xs text-slate-200 focus:outline-none resize-none selection:bg-amber-500 selection:text-black leading-relaxed"></textarea>
+      </div>
+
+      <!-- Direct Importer Launchers -->
+      <div class="mt-4 pt-3 border-t border-mtgBorder flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <button id="archidektDirectBtn" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold text-xs uppercase tracking-wide transition flex items-center gap-1.5 shadow-md">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            <span>Copy & Open Archidekt</span>
+          </button>
+          <button id="moxfieldDirectBtn" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-600 hover:to-indigo-600 text-white font-bold text-xs uppercase tracking-wide transition flex items-center gap-1.5 shadow-md">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            <span>Copy & Open Moxfield</span>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="copyDeckToClipboardBtn" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-mtgBorder text-xs font-medium transition flex items-center gap-1.5">
+            <i class="fa-regular fa-clipboard"></i>
+            <span id="copyDeckBtnText">Copy Decklist</span>
+          </button>
+          <button id="downloadDeckFileBtn" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-mtgBorder text-xs font-medium transition flex items-center gap-1.5">
+            <i class="fa-solid fa-download"></i>
+            <span>Download .txt</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MULTIPLAYER POD GENERATOR MODAL -->
+  <div id="podModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 hidden">
+    <div id="podModalBackdrop" class="fixed inset-0 bg-black/85 backdrop-blur-md transition-opacity"></div>
+    <div class="border rounded-2xl max-w-6xl w-full p-4 sm:p-6 relative z-10 shadow-2xl flex flex-col max-h-[94vh] overflow-hidden">
+      
+      <div class="flex flex-wrap items-center justify-between pb-4 border-b border-mtgBorder/80 gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 flex items-center justify-center text-lg shadow">
+            <i class="fa-solid fa-users-viewfinder"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="font-title text-base sm:text-xl font-bold text-indigo-200">Multiplayer Pod Generator</h3>
+              <span id="podActiveFormatBadge" class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded">Commander</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">Generate balanced, randomized game night tables for 2, 3, or 4 players</p>
+          </div>
+        </div>
+
+        <button id="closePodModalBtn" class="text-slate-400 hover:text-white p-2 rounded-lg">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Pod Configuration Controls -->
+      <div class="mt-4 p-3.5 rounded-xl bg-slate-900/80 border border-mtgBorder flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Pod Size:</span>
+          <div class="inline-flex p-1 rounded-xl bg-slate-950 border border-mtgBorder shadow-inner text-xs">
+            <button data-podsize="2" class="pod-size-btn px-3 py-1.5 rounded-lg font-semibold transition text-slate-400 hover:text-white">2-Player Duel</button>
+            <button data-podsize="3" class="pod-size-btn px-3 py-1.5 rounded-lg font-semibold transition text-slate-400 hover:text-white">3-Player Pod</button>
+            <button data-podsize="4" class="pod-size-btn px-3.5 py-1.5 rounded-lg font-bold transition bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 shadow">4-Player Full Pod</button>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-4 text-xs">
+          <label class="flex items-center gap-2 cursor-pointer select-none">
+            <input type="checkbox" id="podUniqueColorsToggle" checked class="rounded bg-slate-950 border-mtgBorder text-indigo-500 focus:ring-0">
+            <span class="text-slate-300">Diverse Color Identities</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer select-none">
+            <input type="checkbox" id="podAssignChallengesToggle" checked class="rounded bg-slate-950 border-mtgBorder text-indigo-500 focus:ring-0">
+            <span class="text-slate-300">Assign Secret Challenges</span>
+          </label>
+        </div>
+
+        <button id="rollEntirePodBtn" class="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-amber-600 hover:from-indigo-500 hover:to-amber-500 text-white font-bold text-xs uppercase tracking-wider font-title shadow-lg active:scale-[0.99] transition flex items-center gap-2">
+          <i class="fa-solid fa-dice-d20 text-sm"></i>
+          <span>Summon Pod Seats</span>
+        </button>
+      </div>
+
+      <!-- Pod Loading Skeleton -->
+      <div id="podLoadingArea" class="hidden my-8 text-center space-y-3">
+        <div class="w-12 h-12 mx-auto rounded-full bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 text-xl animate-spin">
+          <i class="fa-solid fa-compact-disc"></i>
+        </div>
+        <p class="text-xs font-mono text-indigo-300 tracking-wider uppercase">Scouting the Multiverse for Pod Seats...</p>
+      </div>
+
+      <!-- Pod Seats Container Grid -->
+      <div id="podSeatsGrid" class="flex-1 overflow-y-auto my-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 p-1"></div>
+
+      <!-- Pod Footer Actions -->
+      <div class="pt-3 border-t border-mtgBorder flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="text-slate-400 flex items-center gap-2">
+          <i class="fa-solid fa-shield-halved text-indigo-400"></i>
+          <span>Each seat can be rerolled independently or loaded into the Auto-Deck Engine.</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="copyPodSummaryBtn" class="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-mtgBorder transition flex items-center gap-1.5">
+            <i class="fa-regular fa-clipboard"></i>
+            <span>Copy Pod Summary</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none bg-slate-900 border text-xs font-medium px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2.5">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toastMsg">Deck saved!</span>
+  </div>
+
+  <!-- Floating Hover Preview Tooltip -->
+  <div id="floatingCardTooltip" class="w-60 aspect-[5/7] rounded-xl overflow-hidden shadow-2xl border bg-slate-950 pointer-events-none">
+    <img id="floatingCardImg" src="" alt="Hover Card Preview" class="w-full h-full object-cover">
+  </div>
+
+  <script>
+    const floatingCardTooltip = document.getElementById('floatingCardTooltip');
+    const floatingCardImg = document.getElementById('floatingCardImg');
+
+    function showCardHoverPreview(imgUrl, e) {
+      if (!imgUrl || !floatingCardTooltip || !floatingCardImg) return;
+      floatingCardImg.src = imgUrl;
+      updateTooltipPosition(e);
+      floatingCardTooltip.classList.add('visible');
+    }
+
+    function hideCardHoverPreview() {
+      if (!floatingCardTooltip) return;
+      floatingCardTooltip.classList.remove('visible');
+    }
+
+    function updateTooltipPosition(e) {
+      if (!floatingCardTooltip) return;
+      const xOffset = 20;
+      const yOffset = -120;
+      let left = e.clientX + xOffset;
+      let top = e.clientY + yOffset;
+
+      if (left + 250 > window.innerWidth) left = e.clientX - 260;
+      if (top + 340 > window.innerHeight) top = window.innerHeight - 350;
+      if (top < 10) top = 10;
+
+      floatingCardTooltip.style.left = `${left}px`;
+      floatingCardTooltip.style.top = `${top}px`;
+    }
+
+    // Theme Registry Configuration
+    const THEMES = {
+      mythic: { name: 'Mythic Gold', accent: '#e5c158', icon: 'fa-crown' },
+      phyrexian: { name: 'Phyrexian Oil', accent: '#f43f5e', icon: 'fa-biohazard' },
+      neon: { name: 'Kamigawa Neon', accent: '#06b6d4', icon: 'fa-bolt' },
+      tome: { name: "Urza's Tome", accent: '#d97706', icon: 'fa-book-atlas' }
+    };
+
+    function applyTheme(themeKey) {
+      const chosenKey = THEMES[themeKey] ? themeKey : 'mythic';
+      state.activeTheme = chosenKey;
+      localStorage.setItem('mtg_active_theme', chosenKey);
+      document.documentElement.setAttribute('data-theme', chosenKey);
+
+      // Update checkmarks in theme menu
+      document.querySelectorAll('.theme-option-btn').forEach(btn => {
+        const isSelected = btn.getAttribute('data-theme') === chosenKey;
+        const check = btn.querySelector('.theme-check');
+        if (check) check.classList.toggle('opacity-0', !isSelected);
+      });
+
+      const label = document.getElementById('themeToggleLabel');
+      if (label && THEMES[chosenKey]) {
+        label.textContent = THEMES[chosenKey].name;
+      }
+
+      const themeToggleBtn = document.getElementById('themeToggleBtn');
+      if (themeToggleBtn && THEMES[chosenKey]) {
+        const icon = themeToggleBtn.querySelector('i.fa-palette');
+        if (icon) icon.style.color = THEMES[chosenKey].accent;
+      }
+    }
+
+    // Challenge Pool Definitions
+    const CHALLENGE_POOLS = {
+      budget: [
+        { title: "Budget Under $50", category: "Budget Challenge", difficulty: "Medium", icon: "fa-sack-dollar", description: "The total value of your 99 cards (excluding Commander) must not exceed $50 USD based on market prices." },
+        { title: "Penny Dreadful (< $0.50 per card)", category: "Budget Challenge", difficulty: "Hard", icon: "fa-coins", description: "Every single card in the 99 must cost under $0.50 USD on Scryfall market price." },
+        { title: "Ultra Budget (< $25 Total)", category: "Budget Challenge", difficulty: "Extreme", icon: "fa-piggy-bank", description: "Entire deck including Commander must cost under $25 USD total." },
+        { title: "Pauper Restrictions", category: "Budget Challenge", difficulty: "Medium", icon: "fa-gem", description: "Every card in the 99 must be common rarity only." }
+      ],
+      mechanics: [
+        { title: "Oops! All Permanents (Primal Surge Style)", category: "Mechanical Restriction", difficulty: "Hard", icon: "fa-cubes-stacked", description: "Zero instants and sorceries in the main deck. Everything must be a permanent card." },
+        { title: "Zero Tutors Allowed", category: "Mechanical Restriction", difficulty: "Easy", icon: "fa-compass-drafting", description: "Strictly no search effects (except basic land fetchers like Evolving Wilds). Play purely off the top." },
+        { title: "Companion Constraints (Odd CMC Only)", category: "Mechanical Restriction", difficulty: "Hard", icon: "fa-dice-d6", description: "Every card in your deck must have an odd mana value (1, 3, 5, 7+). Yennett and Obosh would be proud." },
+        { title: "Companion Constraints (Even CMC Only)", category: "Mechanical Restriction", difficulty: "Hard", icon: "fa-shapes", description: "Every card in the deck must have an even mana value (2, 4, 6, 8+). Gyruda style." },
+        { title: "Graveyard Matters", category: "Mechanical Restriction", difficulty: "Medium", icon: "fa-skull", description: "At least 25 cards in the deck must interact with, trigger from, or return cards from the graveyard." },
+        { title: "Voltron Lethal Vector", category: "Mechanical Restriction", difficulty: "Medium", icon: "fa-shield-virus", description: "Primary win condition must be commander damage with at least 15 equipment or aura cards." }
+      ],
+      flavor: [
+        { title: "Beard & Mustache Tribal", category: "Art & Flavor", difficulty: "Spicy", icon: "fa-user-ninja", description: "Every creature card printed must visibly feature facial hair in its artwork." },
+        { title: "Modern Horizons & Beyond (Post-2020 Only)", category: "Art & Flavor", difficulty: "Medium", icon: "fa-clock-rotate-left", description: "Only cards with first printings or art treatments released after January 2020 are allowed." },
+        { title: "Retro Frame Aesthetic", category: "Art & Flavor", difficulty: "Hard", icon: "fa-film", description: "Every card in the deck must have been printed in the classic pre-Modern 1993–2003 retro card frame." },
+        { title: "Looking Left Only", category: "Art & Flavor", difficulty: "Spicy", icon: "fa-eye", description: "The characters in every creature artwork must be facing or looking toward the left of the frame." }
+      ],
+      bracket: [
+        { title: "Precon Power Level (Bracket 2)", category: "Power Level", difficulty: "Casual", icon: "fa-scale-balanced", description: "Average win turn 10+. Balanced mana base, standard ramp, minimal fast-mana, and no infinite loops." },
+        { title: "High-Power Optimized (Bracket 4)", category: "Power Level", difficulty: "High-Power", icon: "fa-fire-flame-curved", description: "Compact win conditions, high interaction density, efficient mana curve averaging under 2.5 MV." },
+        { title: "Battlecruiser Magic (Bracket 1)", category: "Power Level", difficulty: "Casual", icon: "fa-sailboat", description: "Slow, epic commander games. Big stompy creatures, huge spells, minimal stax, and 8+ mana bombs." }
+      ]
+    };
+
+    // State Store
+    const state = {
+      format: 'commander',
+      activeTheme: localStorage.getItem('mtg_active_theme') || 'mythic',
+      selectedColors: new Set(),
+      colorLogic: 'exact',
+      colorCount: 'any',
+      commanderType: 'any',
+      oathSpellType: 'any',
+      budgetOnly: false,
+      excludeUnsets: true,
+      soundEnabled: true,
+      
+      currentCard: null,
+      currentOathPair: null,
+      isFlipped: false,
+
+      generatedDeck: null,
+      isGeneratingDeck: false,
+      activeDeckCategory: 'all',
+      deckSearchQuery: '',
+      deckViolations: new Set(),
+      isSwappingCard: false,
+
+      challengesEnabled: true,
+      challengeLocked: false,
+      currentChallenge: null,
+      challengeCategories: { budget: true, mechanics: true, flavor: true, bracket: true },
+
+      exportFormat: 'archidekt',
+      history: JSON.parse(localStorage.getItem('mtg_rolls_history') || '[]'),
+      favorites: JSON.parse(localStorage.getItem('mtg_rolls_favorites') || '[]'),
+      activeTab: 'favorites',
+
+      podSize: 4,
+      podDiverseColors: true,
+      podAssignChallenges: true,
+      podSeats: [],
+      isGeneratingPod: false
+    };
+
+    // Mana Configurations
+    const MANA_MAP = {
+      'W': { bg: 'bg-[#f8f6d8]', text: 'text-amber-900', label: 'W' },
+      'U': { bg: 'bg-[#0e68ab]', text: 'text-white', label: 'U' },
+      'B': { bg: 'bg-[#26202b]', text: 'text-slate-200', label: 'B' },
+      'R': { bg: 'bg-[#d3202a]', text: 'text-white', label: 'R' },
+      'G': { bg: 'bg-[#00733e]', text: 'text-white', label: 'G' },
+      'C': { bg: 'bg-[#7d7d82]', text: 'text-white', label: 'C' }
+    };
+
+    // Synthesized Web Audio Sound Feedback
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playDiceSound() {
+      if (!state.soundEnabled) return;
+      try {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(320, now);
+        osc.frequency.exponentialRampToValueAtTime(780, now + 0.08);
+        osc.frequency.exponentialRampToValueAtTime(200, now + 0.16);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.2);
+      } catch (e) {
+        console.warn('Audio playback not permitted yet.');
+      }
+    }
+
+    // UI Element References
+    const modeCommanderBtn = document.getElementById('modeCommanderBtn');
+    const modeOathbreakerBtn = document.getElementById('modeOathbreakerBtn');
+    const formatHeaderTitle = document.getElementById('formatHeaderTitle');
+    const formatSubtitle = document.getElementById('formatSubtitle');
+    const formatLogoBadge = document.getElementById('formatLogoBadge');
+    const formatLogoIcon = document.getElementById('formatLogoIcon');
+    const filterFormatTag = document.getElementById('filterFormatTag');
+    const randomizeBtn = document.getElementById('randomizeBtn');
+    const randomizeBtnText = document.getElementById('randomizeBtnText');
+    const randomizeBtnIcon = document.getElementById('randomizeBtnIcon');
+    const queryPreview = document.getElementById('queryPreview');
+    const commanderTypeContainer = document.getElementById('commanderTypeContainer');
+    const oathbreakerSpellContainer = document.getElementById('oathbreakerSpellContainer');
+    const oathbreakerRerollGroup = document.getElementById('oathbreakerRerollGroup');
+    const formatInfoBox = document.getElementById('formatInfoBox');
+
+    const loadingState = document.getElementById('loadingState');
+    const errorState = document.getElementById('errorState');
+    const errorMessage = document.getElementById('errorMessage');
+    const retryBroadBtn = document.getElementById('retryBroadBtn');
+    const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+    const soundToggleBtn = document.getElementById('soundToggleBtn');
+    const soundIcon = document.getElementById('soundIcon');
+
+    // Auto-Build & Deck Viewer Elements
+    const generateDeckCommanderBtn = document.getElementById('generateDeckCommanderBtn');
+    const generateDeckCommanderText = document.getElementById('generateDeckCommanderText');
+    const generateDeckOathBtn = document.getElementById('generateDeckOathBtn');
+    const generateDeckOathText = document.getElementById('generateDeckOathText');
+    const viewDeckBtn = document.getElementById('viewDeckBtn');
+    const viewDeckCount = document.getElementById('viewDeckCount');
+
+    const deckViewerModal = document.getElementById('deckViewerModal');
+    const deckViewerBackdrop = document.getElementById('deckViewerBackdrop');
+    const closeDeckViewerBtn = document.getElementById('closeDeckViewerBtn');
+    const deckViewerExportBtn = document.getElementById('deckViewerExportBtn');
+    const rebuildCurrentDeckBtn = document.getElementById('rebuildCurrentDeckBtn');
+    const deckViewerTitle = document.getElementById('deckViewerTitle');
+    const deckViewerSubtitle = document.getElementById('deckViewerSubtitle');
+    const deckViewerFormatTag = document.getElementById('deckViewerFormatTag');
+
+    const deckBuildProgressBarContainer = document.getElementById('deckBuildProgressBarContainer');
+    const deckBuildProgressBar = document.getElementById('deckBuildProgressBar');
+    const deckBuildStatusText = document.getElementById('deckBuildStatusText');
+    const deckBuildPercentText = document.getElementById('deckBuildPercentText');
+
+    const statTotalCards = document.getElementById('statTotalCards');
+    const statTotalCost = document.getElementById('statTotalCost');
+    const statAvgCmc = document.getElementById('statAvgCmc');
+    const statArchetype = document.getElementById('statArchetype');
+    const manaCurveChart = document.getElementById('manaCurveChart');
+    const deckCardsScrollArea = document.getElementById('deckCardsScrollArea');
+    const deckCardSearch = document.getElementById('deckCardSearch');
+
+    const catCountAll = document.getElementById('catCountAll');
+    const catCountCmdr = document.getElementById('catCountCmdr');
+    const catCountCreatures = document.getElementById('catCountCreatures');
+    const catCountSpells = document.getElementById('catCountSpells');
+    const catCountPerms = document.getElementById('catCountPerms');
+    const catCountLands = document.getElementById('catCountLands');
+
+    // Challenge elements
+    const challengesEnabledToggle = document.getElementById('challengesEnabledToggle');
+    const activeChallengeBanner = document.getElementById('activeChallengeBanner');
+    const rerollChallengeBtn = document.getElementById('rerollChallengeBtn');
+    const quickRerollChallengeBtn = document.getElementById('quickRerollChallengeBtn');
+    const lockChallengeBtn = document.getElementById('lockChallengeBtn');
+    const lockChallengeIcon = document.getElementById('lockChallengeIcon');
+    const lockChallengeText = document.getElementById('lockChallengeText');
+    const challengeTitle = document.getElementById('challengeTitle');
+    const challengeCategoryBadge = document.getElementById('challengeCategoryBadge');
+    const challengeDifficultyBadge = document.getElementById('challengeDifficultyBadge');
+    const challengeDescription = document.getElementById('challengeDescription');
+    const challengeCategoryIcon = document.getElementById('challengeCategoryIcon');
+    const challengeCategoryIconWrap = document.getElementById('challengeCategoryIconWrap');
+
+    const catBudget = document.getElementById('catBudget');
+    const catMechanics = document.getElementById('catMechanics');
+    const catFlavor = document.getElementById('catFlavor');
+    const catBracket = document.getElementById('catBracket');
+
+    // Export Modal Elements
+    const exportModalTriggerBtn = document.getElementById('exportModalTriggerBtn');
+    const exportModal = document.getElementById('exportModal');
+    const exportModalBackdrop = document.getElementById('exportModalBackdrop');
+    const closeExportModalBtn = document.getElementById('closeExportModalBtn');
+    const exportDeckTextarea = document.getElementById('exportDeckTextarea');
+    const exportCardCountLabel = document.getElementById('exportCardCountLabel');
+    const copyDeckToClipboardBtn = document.getElementById('copyDeckToClipboardBtn');
+    const copyDeckBtnText = document.getElementById('copyDeckBtnText');
+    const downloadDeckFileBtn = document.getElementById('downloadDeckFileBtn');
+    const moxfieldDirectBtn = document.getElementById('moxfieldDirectBtn');
+    const archidektDirectBtn = document.getElementById('archidektDirectBtn');
+
+    // Challenge Compliance Elements
+    const deckChallengeComplianceBar = document.getElementById('deckChallengeComplianceBar');
+    const challengeComplianceIcon = document.getElementById('challengeComplianceIcon');
+    const challengeComplianceTitle = document.getElementById('challengeComplianceTitle');
+    const challengeComplianceDetails = document.getElementById('challengeComplianceDetails');
+    const autoFixNonCompliantBtn = document.getElementById('autoFixNonCompliantBtn');
+    const autoFixCount = document.getElementById('autoFixCount');
+
+    // Pod Generator Modal Elements
+    const podModalTriggerBtn = document.getElementById('podModalTriggerBtn');
+    const podModal = document.getElementById('podModal');
+    const podModalBackdrop = document.getElementById('podModalBackdrop');
+    const closePodModalBtn = document.getElementById('closePodModalBtn');
+    const podActiveFormatBadge = document.getElementById('podActiveFormatBadge');
+    const rollEntirePodBtn = document.getElementById('rollEntirePodBtn');
+    const podSeatsGrid = document.getElementById('podSeatsGrid');
+    const podLoadingArea = document.getElementById('podLoadingArea');
+    const podUniqueColorsToggle = document.getElementById('podUniqueColorsToggle');
+    const podAssignChallengesToggle = document.getElementById('podAssignChallengesToggle');
+    const copyPodSummaryBtn = document.getElementById('copyPodSummaryBtn');
+
+    // Commander Showcase
+    const commanderShowcase = document.getElementById('commanderShowcase');
+    const cardImageContainer = document.getElementById('cardImageContainer');
+    const flipper = document.getElementById('flipper');
+    const flipBtn = document.getElementById('flipBtn');
+    const cardImgFront = document.getElementById('cardImgFront');
+    const cardImgBack = document.getElementById('cardImgBack');
+    const cardName = document.getElementById('cardName');
+    const cardManaCost = document.getElementById('cardManaCost');
+    const cardTypeLine = document.getElementById('cardTypeLine');
+    const cardOracleText = document.getElementById('cardOracleText');
+    const cardStats = document.getElementById('cardStats');
+    const cardArtist = document.getElementById('cardArtist');
+    const cardPrice = document.getElementById('cardPrice');
+    const rarityPill = document.getElementById('rarityPill');
+    const setInfoPill = document.getElementById('setInfoPill');
+    const scryfallLink = document.getElementById('scryfallLink');
+    const edhrecLink = document.getElementById('edhrecLink');
+    const colorIdentityBadges = document.getElementById('colorIdentityBadges');
+    const toggleFavoriteBtn = document.getElementById('toggleFavoriteBtn');
+    const copyShareBtn = document.getElementById('copyShareBtn');
+
+    // Oathbreaker Showcase
+    const oathbreakerShowcase = document.getElementById('oathbreakerShowcase');
+    const pwImg = document.getElementById('pwImg');
+    const pwName = document.getElementById('pwName');
+    const pwType = document.getElementById('pwType');
+    const pwManaCost = document.getElementById('pwManaCost');
+    const pwOracle = document.getElementById('pwOracle');
+    const pwLoyalty = document.getElementById('pwLoyalty');
+    const pwScryfallLink = document.getElementById('pwScryfallLink');
+    const pwOathLink = document.getElementById('pwOathLink');
+
+    const spellImg = document.getElementById('spellImg');
+    const spellName = document.getElementById('spellName');
+    const spellType = document.getElementById('spellType');
+    const spellManaCost = document.getElementById('spellManaCost');
+    const spellOracle = document.getElementById('spellOracle');
+    const spellPrice = document.getElementById('spellPrice');
+    const spellScryfallLink = document.getElementById('spellScryfallLink');
+    const spellEdhrecLink = document.getElementById('spellEdhrecLink');
+    const oathIdentityPill = document.getElementById('oathIdentityPill');
+    const toggleFavoriteOathBtn = document.getElementById('toggleFavoriteOathBtn');
+    const copyShareOathBtn = document.getElementById('copyShareOathBtn');
+    const rerollOathbreakerOnlyBtn = document.getElementById('rerollOathbreakerOnlyBtn');
+    const rerollSpellOnlyBtn = document.getElementById('rerollSpellOnlyBtn');
+
+    // Drawer Elements
+    const drawer = document.getElementById('drawer');
+    const drawerBackdrop = document.getElementById('drawerBackdrop');
+    const drawerToggleBtn = document.getElementById('drawerToggleBtn');
+    const closeDrawerBtn = document.getElementById('closeDrawerBtn');
+    const tabFavorites = document.getElementById('tabFavorites');
+    const tabHistory = document.getElementById('tabHistory');
+    const drawerListContainer = document.getElementById('drawerListContainer');
+    const savedCountBadge = document.getElementById('savedCountBadge');
+    const favTabCount = document.getElementById('favTabCount');
+    const histTabCount = document.getElementById('histTabCount');
+    const clearListBtn = document.getElementById('clearListBtn');
+
+    // Theme Switcher Menu Interactions
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const themeMenu = document.getElementById('themeMenu');
+    const themeDropdownWrapper = document.getElementById('themeDropdownWrapper');
+
+    if (themeToggleBtn && themeMenu) {
+      themeToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        themeMenu.classList.toggle('hidden');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (themeDropdownWrapper && !themeDropdownWrapper.contains(e.target)) {
+          themeMenu.classList.add('hidden');
+        }
+      });
+
+      document.querySelectorAll('.theme-option-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const t = btn.getAttribute('data-theme');
+          playDiceSound();
+          applyTheme(t);
+          themeMenu.classList.add('hidden');
+          showToast(`Theme changed to ${THEMES[t]?.name || t}`);
+        });
+      });
+    }
+
+    function rollNewChallenge(force = false) {
+      if (!state.challengesEnabled) return;
+      if (state.challengeLocked && !force) return;
+
+      const activePool = [];
+      if (state.challengeCategories.budget) activePool.push(...CHALLENGE_POOLS.budget);
+      if (state.challengeCategories.mechanics) activePool.push(...CHALLENGE_POOLS.mechanics);
+      if (state.challengeCategories.flavor) activePool.push(...CHALLENGE_POOLS.flavor);
+      if (state.challengeCategories.bracket) activePool.push(...CHALLENGE_POOLS.bracket);
+
+      if (activePool.length === 0) {
+        state.currentChallenge = null;
+        activeChallengeBanner.classList.add('hidden');
+        return;
+      }
+
+      const randomChallenge = activePool[Math.floor(Math.random() * activePool.length)];
+      state.currentChallenge = randomChallenge;
+      renderActiveChallenge();
+    }
+
+    function renderActiveChallenge() {
+      if (!state.challengesEnabled || !state.currentChallenge) {
+        activeChallengeBanner.classList.add('hidden');
+        return;
+      }
+
+      const c = state.currentChallenge;
+      activeChallengeBanner.classList.remove('hidden');
+      challengeTitle.textContent = c.title;
+      challengeCategoryBadge.textContent = c.category;
+      challengeDifficultyBadge.textContent = `Difficulty: ${c.difficulty}`;
+      challengeDescription.textContent = c.description;
+      challengeCategoryIcon.className = `fa-solid ${c.icon}`;
+    }
+
+    // Toggle challenge state
+    challengesEnabledToggle.addEventListener('change', (e) => {
+      state.challengesEnabled = e.target.checked;
+      if (state.challengesEnabled) {
+        if (!state.currentChallenge) rollNewChallenge(true);
+        activeChallengeBanner.classList.remove('hidden');
+        showToast('Challenge Roulette enabled!');
+      } else {
+        activeChallengeBanner.classList.add('hidden');
+        showToast('Challenge Roulette disabled.');
+      }
+    });
+
+    catBudget.addEventListener('change', (e) => { state.challengeCategories.budget = e.target.checked; });
+    catMechanics.addEventListener('change', (e) => { state.challengeCategories.mechanics = e.target.checked; });
+    catFlavor.addEventListener('change', (e) => { state.challengeCategories.flavor = e.target.checked; });
+    catBracket.addEventListener('change', (e) => { state.challengeCategories.bracket = e.target.checked; });
+
+    rerollChallengeBtn.addEventListener('click', () => { playDiceSound(); rollNewChallenge(true); showToast('Rolled fresh challenge!'); });
+    quickRerollChallengeBtn.addEventListener('click', () => { playDiceSound(); rollNewChallenge(true); showToast('Rolled fresh challenge!'); });
+
+    lockChallengeBtn.addEventListener('click', () => {
+      state.challengeLocked = !state.challengeLocked;
+      if (state.challengeLocked) {
+        lockChallengeIcon.className = 'fa-solid fa-lock text-amber-400';
+        lockChallengeText.textContent = 'Locked';
+        lockChallengeBtn.classList.add('border-amber-500/40', 'bg-amber-500/10');
+        showToast('Challenge locked across rolls!');
+      } else {
+        lockChallengeIcon.className = 'fa-solid fa-lock-open';
+        lockChallengeText.textContent = 'Unlock';
+        lockChallengeBtn.classList.remove('border-amber-500/40', 'bg-amber-500/10');
+        showToast('Challenge unlocked.');
+      }
+    });
+
+    function generateDeckExportContent(targetFormat = state.exportFormat) {
+      const cleanToggle = document.getElementById('cleanExportToggle');
+      const isClean = cleanToggle ? cleanToggle.checked : true;
+      const challengeComment = (!isClean && state.challengesEnabled && state.currentChallenge) 
+        ? `// Challenge: ${state.currentChallenge.title} (${state.currentChallenge.category} - ${state.currentChallenge.difficulty})\n// Restriction: ${state.currentChallenge.description}\n\n`
+        : '';
+
+      if (state.generatedDeck && state.generatedDeck.cards && state.generatedDeck.cards.length > 0) {
+        const deck = state.generatedDeck;
+        const totalCards = deck.cards.reduce((sum, c) => sum + (c.qty || 1), 0);
+        if (exportCardCountLabel) exportCardCountLabel.textContent = `${totalCards} Cards`;
+
+        if (isClean || targetFormat === 'archidekt') {
+          let output = '';
+          if (!isClean && challengeComment) output += challengeComment;
+          deck.cards.filter(c => c.category === 'Commander' || c.category === 'Signature Spell').forEach(c => {
+            output += `${c.qty || 1} ${c.name}\n`;
+          });
+          deck.cards.filter(c => c.category !== 'Commander' && c.category !== 'Signature Spell').forEach(c => {
+            output += `${c.qty || 1} ${c.name}\n`;
+          });
+          return output.trim();
+        }
+
+        if (targetFormat === 'moxfield') {
+          let output = `// Auto-generated for Moxfield\n${challengeComment}`;
+          deck.cards.filter(c => c.category === 'Commander').forEach(c => { output += `${c.qty} ${c.name} *CMDR*\n`; });
+          deck.cards.filter(c => c.category === 'Signature Spell').forEach(c => { output += `${c.qty} ${c.name} *SIGNATURE*\n`; });
+          output += `\n`;
+          deck.cards.filter(c => c.category !== 'Commander' && c.category !== 'Signature Spell').forEach(c => {
+            output += `${c.qty} ${c.name}\n`;
+          });
+          return output;
+        } else {
+          let output = `${challengeComment}// Commander\n`;
+          deck.cards.filter(c => c.category === 'Commander' || c.category === 'Signature Spell').forEach(c => {
+            output += `${c.qty} ${c.name}\n`;
+          });
+          output += `\n// Mainboard\n`;
+          deck.cards.filter(c => c.category !== 'Commander' && c.category !== 'Signature Spell').forEach(c => {
+            output += `${c.qty} ${c.name}\n`;
+          });
+          return output;
+        }
+      }
+
+      if (state.format === 'commander') {
+        if (!state.currentCard) return '// No Commander rolled yet.';
+        const cardName = state.currentCard.name;
+        if (exportCardCountLabel) exportCardCountLabel.textContent = '1 Commander Card';
+        if (isClean || targetFormat === 'archidekt') return `1 ${cardName}`;
+        else if (targetFormat === 'moxfield') return `${challengeComment}1 ${cardName} *CMDR*`;
+        else return `${challengeComment}// Commander\n1 ${cardName}\n`;
+      } else {
+        if (!state.currentOathPair) return '// No Oathbreaker pair rolled yet.';
+        const pw = state.currentOathPair.planeswalker.name;
+        const spell = state.currentOathPair.spell.name;
+        if (exportCardCountLabel) exportCardCountLabel.textContent = '1 Oathbreaker + 1 Signature Spell';
+        if (isClean || targetFormat === 'archidekt') return `1 ${pw}\n1 ${spell}`;
+        else if (targetFormat === 'moxfield') return `${challengeComment}1 ${pw} *CMDR*\n1 ${spell} *SIGNATURE*`;
+        else return `${challengeComment}// Oathbreaker\n1 ${pw}\n// Signature Spell\n1 ${spell}\n`;
+      }
+    }
+
+    function openExportModal() {
+      exportDeckTextarea.value = generateDeckExportContent(state.exportFormat);
+      exportModal.classList.remove('hidden');
+    }
+    function closeExportModal() { exportModal.classList.add('hidden'); }
+
+    function detectDeckArchetype(card) {
+      const text = (card.oracle_text || '').toLowerCase();
+      const type = (card.type_line || '').toLowerCase();
+      if (text.includes('token') || text.includes('create ')) return 'Token Swarm & Go-Wide';
+      if (text.includes('+1/+1 counter') || text.includes('proliferate')) return '+1/+1 Counters & Growth';
+      if (text.includes('graveyard') || (text.includes('return') && text.includes('battlefield')) || text.includes('dredge')) return 'Graveyard Reanimator';
+      if (text.includes('instant') || text.includes('sorcery') || text.includes('magecraft') || text.includes('cast a spell')) return 'Spellslinger & Cantrips';
+      if (text.includes('artifact') || text.includes('equipment') || text.includes('vehicle')) return 'Artifacts & Voltron';
+      if (text.includes('sacrifice') || text.includes('dies, you')) return 'Aristocrats & Sacrifice';
+      if (text.includes('land') && (text.includes('landfall') || text.includes('play an additional land'))) return 'Lands Matter & Ramp';
+      if (type.includes('dragon') || type.includes('elf') || type.includes('goblin') || type.includes('zombie') || type.includes('vampire')) return 'Tribal Aggro';
+      return 'Midrange & Value Engine';
+    }
+
+    function getChallengeScryfallFilters() {
+      if (!state.challengesEnabled || !state.currentChallenge) return '';
+      const c = state.currentChallenge;
+      let filters = [];
+      if (c.title.includes('< $0.50') || c.title.includes('Penny Dreadful')) filters.push('usd<0.50');
+      else if (c.title.includes('Budget Under $50') || c.title.includes('$25')) filters.push('usd<1.50');
+      else if (c.title.includes('Pauper')) filters.push('rarity:common');
+
+      if (c.title.includes('Permanents')) filters.push('-t:instant -t:sorcery');
+      else if (c.title.includes('Odd CMC')) filters.push('(cmc=1 or cmc=3 or cmc=5 or cmc=7 or cmc=9)');
+      else if (c.title.includes('Even CMC')) filters.push('(cmc=0 or cmc=2 or cmc=4 or cmc=6 or cmc=8)');
+      else if (c.title.includes('Zero Tutors')) filters.push('-o:"search your library"');
+
+      if (c.title.includes('Retro Frame')) filters.push('is:old');
+      else if (c.title.includes('Post-2020')) filters.push('year>=2020');
+      return filters.length > 0 ? filters.join(' ') : '';
+    }
+
+    async function queryScryfallList(query, limit = 20) {
+      try {
+        const url = `https://api.scryfall.com/cards/search?q=${encodeURIComponent(query)}&order=edhrec&dir=asc`;
+        const res = await fetch(url);
+        if (!res.ok) return [];
+        const data = await res.json();
+        return (data.data || []).slice(0, limit);
+      } catch (e) {
+        console.warn('Scryfall synthesis sub-query failed:', query, e);
+        return [];
+      }
+    }
+
+    async function buildDeckAutomated() {
+      if (state.format === 'commander' && !state.currentCard) {
+        showToast('Please roll a Commander first!');
+        return;
+      }
+      if (state.format === 'oathbreaker' && !state.currentOathPair) {
+        showToast('Please roll an Oathbreaker pair first!');
+        return;
+      }
+
+      state.isGeneratingDeck = true;
+      playDiceSound();
+
+      deckViewerModal.classList.remove('hidden');
+      deckBuildProgressBarContainer.classList.remove('hidden');
+      deckBuildProgressBar.style.width = '10%';
+      deckBuildPercentText.textContent = '10%';
+      deckBuildStatusText.textContent = 'Detecting commander archetype & analyzing color identity...';
+
+      const isEDH = (state.format === 'commander');
+      const targetDeckSize = isEDH ? 100 : 60;
+      const targetLandCount = isEDH ? 37 : 23;
+      const targetNonLandCount = targetDeckSize - targetLandCount;
+      
+      const leader = isEDH ? state.currentCard : state.currentOathPair.planeswalker;
+      const sigSpell = (!isEDH) ? state.currentOathPair.spell : null;
+      const colors = (leader.color_identity && leader.color_identity.length > 0) ? leader.color_identity : [];
+      const colorStr = colors.length > 0 ? colors.join('') : 'C';
+      const idQuery = (colors.length === 0) ? 'identity=colorless' : `identity<=${colorStr}`;
+      const challengeAddon = getChallengeScryfallFilters();
+      const archetype = detectDeckArchetype(leader);
+
+      deckViewerTitle.textContent = `Auto-Deck: ${leader.name}`;
+      deckViewerSubtitle.textContent = `Archetype: ${archetype} | Constraints: ${state.currentChallenge ? state.currentChallenge.title : 'None'}`;
+      deckViewerFormatTag.textContent = isEDH ? 'Commander (100 Cards)' : 'Oathbreaker (60 Cards)';
+
+      const collectedCards = [];
+      const seenNames = new Set();
+
+      function addUnique(cardObj, category, forceQty = 1) {
+        if (!cardObj || !cardObj.name) return false;
+        const baseName = cardObj.name.split(' // ')[0].trim();
+        if (seenNames.has(baseName) && !cardObj.type_line?.includes('Basic Land')) return false;
+        seenNames.add(baseName);
+        collectedCards.push({
+          ...cardObj,
+          category: category,
+          qty: forceQty
+        });
+        return true;
+      }
+
+      addUnique(leader, 'Commander');
+      if (sigSpell) addUnique(sigSpell, 'Signature Spell');
+
+      function getNonLandsCount() {
+        return collectedCards.filter(c => !c.type_line?.includes('Land')).reduce((sum, c) => sum + (c.qty || 1), 0);
+      }
+
+      // Step 1: Ramp & Mana Rocks
+      deckBuildProgressBar.style.width = '25%';
+      deckBuildPercentText.textContent = '25%';
+      deckBuildStatusText.textContent = 'Curating Mana Ramp, Rocks & Dorks...';
+
+      const rampQuery = `format:${isEDH ? 'commander' : 'oathbreaker'} ${idQuery} (t:artifact or t:creature or t:sorcery) (o:"add {" or o:"search your library for a" and o:"land") cmc<=3 ${challengeAddon}`;
+      const rampCards = await queryScryfallList(rampQuery, isEDH ? 14 : 8);
+      rampCards.forEach(c => {
+        if (!c.type_line?.includes('Land') && getNonLandsCount() < targetNonLandCount) addUnique(c, 'Ramp & Rocks');
+      });
+
+      // Step 2: Card Advantage
+      deckBuildProgressBar.style.width = '45%';
+      deckBuildPercentText.textContent = '45%';
+      deckBuildStatusText.textContent = 'Gathering Card Draw & Engine Cards...';
+
+      const drawQuery = `format:${isEDH ? 'commander' : 'oathbreaker'} ${idQuery} (o:"draw a card" or o:"draws a card" or o:"draw cards") cmc<=4 ${challengeAddon}`;
+      const drawCards = await queryScryfallList(drawQuery, isEDH ? 14 : 8);
+      drawCards.forEach(c => {
+        if (!c.type_line?.includes('Land') && getNonLandsCount() < targetNonLandCount) addUnique(c, 'Card Draw');
+      });
+
+      // Step 3: Interaction & Removal
+      deckBuildProgressBar.style.width = '65%';
+      deckBuildPercentText.textContent = '65%';
+      deckBuildStatusText.textContent = 'Gathering Removal, Counters & Board Wipes...';
+
+      const removalQuery = `format:${isEDH ? 'commander' : 'oathbreaker'} ${idQuery} (o:"destroy target" or o:"exile target" or o:"counter target" or o:"destroy all") cmc<=4 ${challengeAddon}`;
+      const removalCards = await queryScryfallList(removalQuery, isEDH ? 14 : 7);
+      removalCards.forEach(c => {
+        if (!c.type_line?.includes('Land') && getNonLandsCount() < targetNonLandCount) addUnique(c, 'Interaction & Removal');
+      });
+
+      // Step 4: Synergy
+      deckBuildProgressBar.style.width = '80%';
+      deckBuildPercentText.textContent = '80%';
+      deckBuildStatusText.textContent = `Gathering ${archetype} Synergy & Win Conditions...`;
+
+      let synergyTerms = 'creature';
+      if (archetype.includes('Token')) synergyTerms = 'o:token';
+      else if (archetype.includes('Counters')) synergyTerms = 'o:counter';
+      else if (archetype.includes('Graveyard')) synergyTerms = '(o:graveyard or o:dies)';
+      else if (archetype.includes('Spellslinger')) synergyTerms = '(t:instant or t:sorcery)';
+      else if (archetype.includes('Artifacts')) synergyTerms = 't:artifact';
+      
+      const synergyQuery = `format:${isEDH ? 'commander' : 'oathbreaker'} ${idQuery} (${synergyTerms}) ${challengeAddon}`;
+      const synergyCards = await queryScryfallList(synergyQuery, isEDH ? 28 : 16);
+      synergyCards.forEach(c => {
+        if (!c.type_line?.includes('Land') && getNonLandsCount() < targetNonLandCount) addUnique(c, 'Synergy & Payoffs');
+      });
+
+      // Fill remaining non-land slots if needed
+      let neededSpells = targetNonLandCount - getNonLandsCount();
+      if (neededSpells > 0) {
+        deckBuildStatusText.textContent = 'Synthesizing staple creatures & permanent support...';
+        const fillerQuery = `format:${isEDH ? 'commander' : 'oathbreaker'} ${idQuery} t:creature ${challengeAddon}`;
+        const fillerCards = await queryScryfallList(fillerQuery, Math.max(neededSpells + 8, 20));
+        fillerCards.forEach(c => {
+          if (getNonLandsCount() < targetNonLandCount && !c.type_line?.includes('Land')) addUnique(c, 'Creatures');
+        });
+      }
+
+      neededSpells = targetNonLandCount - getNonLandsCount();
+      if (neededSpells > 0) {
+        const broadFallbackQuery = `format:${isEDH ? 'commander' : 'oathbreaker'} ${idQuery} (t:creature or t:artifact or t:enchantment)`;
+        const broadCards = await queryScryfallList(broadFallbackQuery, neededSpells + 10);
+        broadCards.forEach(c => {
+          if (getNonLandsCount() < targetNonLandCount && !c.type_line?.includes('Land')) addUnique(c, 'Permanents');
+        });
+      }
+
+      // Step 5: Synthesize Balanced Mana Base
+      deckBuildProgressBar.style.width = '92%';
+      deckBuildPercentText.textContent = '92%';
+      deckBuildStatusText.textContent = 'Synthesizing Mana Base & Land Allocation...';
+
+      const currentNonLandTotal = getNonLandsCount();
+      const landsNeeded = Math.max(1, targetDeckSize - currentNonLandTotal);
+
+      const stapleLands = ['Command Tower', 'Exotic Orchard', 'Path of Ancestry', 'Reliquary Tower'];
+      let utilityLandsAdded = 0;
+      const maxUtility = Math.min(landsNeeded - 5, isEDH ? 4 : 2);
+
+      if (maxUtility > 0) {
+        for (const landName of stapleLands) {
+          if (utilityLandsAdded >= maxUtility) break;
+          if (colors.length >= 1 || landName === 'Reliquary Tower') {
+            const added = addUnique({
+              name: landName,
+              type_line: 'Land',
+              cmc: 0,
+              mana_cost: '',
+              prices: { usd: '0.25' },
+              rarity: 'common'
+            }, 'Lands');
+            if (added) utilityLandsAdded++;
+          }
+        }
+      }
+
+      const BASIC_LANDS = { 'W': 'Plains', 'U': 'Island', 'B': 'Swamp', 'R': 'Mountain', 'G': 'Forest' };
+      const remainingBasicSlots = Math.max(0, landsNeeded - utilityLandsAdded);
+
+      if (colors.length === 0) {
+        collectedCards.push({
+          name: 'Wastes',
+          type_line: 'Basic Land',
+          cmc: 0,
+          mana_cost: '',
+          prices: { usd: '0.15' },
+          rarity: 'common',
+          category: 'Lands',
+          qty: remainingBasicSlots
+        });
+      } else {
+        const perColor = Math.floor(remainingBasicSlots / colors.length);
+        const remainder = remainingBasicSlots % colors.length;
+
+        colors.forEach((col, idx) => {
+          const qty = perColor + (idx < remainder ? 1 : 0);
+          if (qty > 0) {
+            collectedCards.push({
+              name: BASIC_LANDS[col] || 'Plains',
+              type_line: 'Basic Land',
+              cmc: 0,
+              mana_cost: '',
+              prices: { usd: '0.10' },
+              rarity: 'common',
+              category: 'Lands',
+              qty: qty
+            });
+          }
+        });
+      }
+
+      const finalCount = collectedCards.reduce((sum, c) => sum + (c.qty || 1), 0);
+      if (finalCount !== targetDeckSize) {
+        const discrepancy = targetDeckSize - finalCount;
+        const targetBasic = collectedCards.find(c => c.type_line?.includes('Basic Land'));
+        if (targetBasic) {
+          targetBasic.qty = Math.max(1, (targetBasic.qty || 1) + discrepancy);
+        }
+      }
+
+      deckBuildProgressBar.style.width = '100%';
+      deckBuildPercentText.textContent = '100%';
+      deckBuildStatusText.textContent = 'Deck Assembly Complete!';
+
+      setTimeout(() => { deckBuildProgressBarContainer.classList.add('hidden'); }, 700);
+
+      state.generatedDeck = {
+        leader: leader,
+        sigSpell: sigSpell,
+        format: state.format,
+        archetype: archetype,
+        challenge: state.currentChallenge,
+        cards: collectedCards
+      };
+
+      state.isGeneratingDeck = false;
+      renderDeckViewer();
+      updateViewDeckButton();
+      evaluateDeckCompliance();
+      showToast(`Generated exact ${collectedCards.reduce((s, c) => s + (c.qty || 1), 0)}-card deck!`);
+    }
+
+    function renderDeckViewer() {
+      if (!state.generatedDeck) return;
+      const deck = state.generatedDeck;
+      const cards = deck.cards;
+
+      let totalQty = 0;
+      let totalCost = 0;
+      let totalCmc = 0;
+      let nonLandCount = 0;
+      const cmcBuckets = [0, 0, 0, 0, 0, 0, 0, 0];
+
+      cards.forEach(c => {
+        const q = c.qty || 1;
+        totalQty += q;
+        const price = parseFloat(c.prices?.usd || 0);
+        totalCost += price * q;
+
+        if (!c.type_line?.includes('Land')) {
+          const cmc = Math.min(7, Math.floor(c.cmc || 0));
+          cmcBuckets[cmc] += q;
+          totalCmc += (c.cmc || 0) * q;
+          nonLandCount += q;
+        }
+      });
+
+      const isEDH = (state.format === 'commander');
+      const expectedSize = isEDH ? 100 : 60;
+      statTotalCards.innerHTML = `${totalQty} Cards ${totalQty === expectedSize ? '<span class="text-emerald-400 text-xs ml-1"><i class="fa-solid fa-circle-check"></i> Exact</span>' : ''}`;
+      statTotalCost.textContent = `$${totalCost.toFixed(2)} USD`;
+      statAvgCmc.textContent = nonLandCount > 0 ? (totalCmc / nonLandCount).toFixed(2) : '0.00';
+      statArchetype.textContent = deck.archetype;
+
+      manaCurveChart.innerHTML = '';
+      const maxBucket = Math.max(...cmcBuckets, 1);
+      cmcBuckets.forEach((count, idx) => {
+        const heightPct = Math.max(8, Math.round((count / maxBucket) * 100));
+        const col = document.createElement('div');
+        col.className = 'flex-1 flex flex-col items-center gap-1 group relative';
+        col.innerHTML = `
+          <div class="text-[9px] font-mono text-slate-400 opacity-80 group-hover:text-amber-300">${count}</div>
+          <div class="w-full bg-slate-800 rounded-t-sm h-full flex items-end">
+            <div class="w-full bg-gradient-to-t from-amber-600 to-amber-300 rounded-t-sm transition-all duration-300 group-hover:brightness-125" style="height: ${heightPct}%"></div>
+          </div>
+          <div class="text-[10px] font-bold text-slate-300">${idx === 7 ? '7+' : idx}</div>
+        `;
+        manaCurveChart.appendChild(col);
+      });
+
+      catCountAll.textContent = totalQty;
+      catCountCmdr.textContent = cards.filter(c => c.category === 'Commander' || c.category === 'Signature Spell').reduce((s, c) => s + (c.qty || 1), 0);
+      catCountCreatures.textContent = cards.filter(c => (c.type_line?.includes('Creature') || c.category === 'Creatures') && c.category !== 'Commander').reduce((s, c) => s + (c.qty || 1), 0);
+      catCountSpells.textContent = cards.filter(c => (c.type_line?.includes('Instant') || c.type_line?.includes('Sorcery') || c.category === 'Card Draw' || c.category === 'Interaction & Removal') && c.category !== 'Commander' && c.category !== 'Signature Spell').reduce((s, c) => s + (c.qty || 1), 0);
+      catCountPerms.textContent = cards.filter(c => (c.type_line?.includes('Artifact') || c.type_line?.includes('Enchantment') || c.category === 'Ramp & Rocks' || c.category === 'Synergy & Payoffs') && !c.type_line?.includes('Land') && c.category !== 'Commander').reduce((s, c) => s + (c.qty || 1), 0);
+      catCountLands.textContent = cards.filter(c => c.category === 'Lands' || c.type_line?.includes('Land')).reduce((s, c) => s + (c.qty || 1), 0);
+
+      renderCardListRows();
+      evaluateDeckCompliance();
+    }
+
+    function renderCardListRows() {
+      deckCardsScrollArea.innerHTML = '';
+      if (!state.generatedDeck) return;
+
+      const q = (state.deckSearchQuery || '').toLowerCase();
+      const currentCat = state.activeDeckCategory;
+
+      const filtered = state.generatedDeck.cards.filter(c => {
+        const matchesQuery = !q || c.name.toLowerCase().includes(q) || (c.type_line && c.type_line.toLowerCase().includes(q));
+        if (!matchesQuery) return false;
+
+        if (currentCat === 'all') return true;
+        if (currentCat === 'Commander') return c.category === 'Commander' || c.category === 'Signature Spell';
+        if (currentCat === 'Creatures') return c.type_line?.includes('Creature') && c.category !== 'Commander';
+        if (currentCat === 'Spells') return (c.type_line?.includes('Instant') || c.type_line?.includes('Sorcery') || c.category === 'Card Draw' || c.category === 'Interaction & Removal') && c.category !== 'Signature Spell';
+        if (currentCat === 'Permanents') return (c.type_line?.includes('Artifact') || c.type_line?.includes('Enchantment') || c.category === 'Ramp & Rocks' || c.category === 'Synergy & Payoffs') && !c.type_line?.includes('Land') && c.category !== 'Commander';
+        if (currentCat === 'Lands') return c.category === 'Lands' || c.type_line?.includes('Land');
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        deckCardsScrollArea.innerHTML = `<div class="p-8 text-center text-slate-500 text-xs">No cards found matching this filter.</div>`;
+        return;
+      }
+
+      filtered.forEach(c => {
+        const row = document.createElement('div');
+        row.className = 'px-3.5 py-2.5 flex items-center justify-between text-xs hover:bg-slate-800/80 transition-all group cursor-pointer border-b border-mtgBorder/40 last:border-0';
+
+        const priceText = c.prices?.usd ? `$${c.prices.usd}` : '--';
+        const isCommander = c.category === 'Commander' || c.category === 'Signature Spell';
+        const isBasicLand = c.type_line?.includes('Basic Land');
+        const isViolation = state.deckViolations.has(c.name);
+        const cardImgUrl = c.image_uris?.normal || c.image_uris?.large || c.card_faces?.[0]?.image_uris?.normal || '';
+
+        row.innerHTML = `
+          <div class="flex items-center gap-3 min-w-0">
+            <span class="font-mono font-bold text-amber-400 w-5 text-right shrink-0">${c.qty || 1}x</span>
+            <div class="truncate">
+              <span class="font-semibold ${isCommander ? 'text-amber-300 font-title' : 'text-slate-200'} group-hover:text-amber-200 transition">${c.name}</span>
+              <span class="text-[10px] text-slate-400 ml-1.5 hidden sm:inline">(${c.type_line || 'Card'})</span>
+              ${isViolation ? '<span class="text-[9px] px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 ml-1.5 uppercase font-mono">Violates Rule</span>' : ''}
+            </div>
+          </div>
+          <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+            <span class="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-slate-950 text-slate-400 hidden xs:inline border border-mtgBorder/50">${c.category || 'Deck'}</span>
+            <span class="font-mono text-emerald-400 text-[11px] w-14 text-right">${priceText}</span>
+            ${(!isCommander && !isBasicLand) ? `
+              <button class="swap-card-btn p-1.5 rounded-lg text-slate-400 hover:text-amber-300 hover:bg-slate-700/80 transition" title="Swap / Reroll this card" data-cardname="${c.name.replace(/"/g, '&quot;')}">
+                <i class="fa-solid fa-arrows-rotate text-xs"></i>
+              </button>
+            ` : '<div class="w-6"></div>'}
+            <a href="${c.scryfall_uri || `https://scryfall.com/search?q=${encodeURIComponent(c.name)}`}" target="_blank" rel="noopener" class="text-slate-500 hover:text-amber-400 transition" title="View on Scryfall">
+              <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+            </a>
+          </div>
+        `;
+
+        if (cardImgUrl) {
+          row.addEventListener('mouseenter', (e) => showCardHoverPreview(cardImgUrl, e));
+          row.addEventListener('mousemove', (e) => updateTooltipPosition(e));
+          row.addEventListener('mouseleave', hideCardHoverPreview);
+        }
+
+        const swapBtn = row.querySelector('.swap-card-btn');
+        if (swapBtn) {
+          swapBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            swapSingleCard(c.name);
+          });
+        }
+
+        deckCardsScrollArea.appendChild(row);
+      });
+    }
+
+    function updateViewDeckButton() {
+      if (state.generatedDeck && state.generatedDeck.cards) {
+        const count = state.generatedDeck.cards.reduce((s, c) => s + (c.qty || 1), 0);
+        viewDeckCount.textContent = count;
+        viewDeckBtn.classList.remove('hidden');
+      } else {
+        viewDeckBtn.classList.add('hidden');
+      }
+    }
+
+    document.querySelectorAll('.deck-cat-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        playDiceSound();
+        document.querySelectorAll('.deck-cat-btn').forEach(b => {
+          b.className = 'deck-cat-btn px-2.5 py-1 rounded-lg bg-slate-900 text-slate-300 border border-mtgBorder font-medium';
+        });
+        btn.className = 'deck-cat-btn px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 font-medium';
+        state.activeDeckCategory = btn.getAttribute('data-cat');
+        renderCardListRows();
+      });
+    });
+
+    deckCardSearch.addEventListener('input', (e) => {
+      state.deckSearchQuery = e.target.value;
+      renderCardListRows();
+    });
+
+    function handleCopyAndOpen(serviceUrl, serviceName) {
+      const content = generateDeckExportContent(serviceName === 'Archidekt' ? 'archidekt' : 'moxfield');
+      copyToClipboard(content, `Decklist copied! Opening ${serviceName}...`);
+      window.open(serviceUrl, '_blank', 'noopener');
+    }
+
+    if (archidektDirectBtn) {
+      archidektDirectBtn.addEventListener('click', () => {
+        handleCopyAndOpen('https://archidekt.com/decks/new', 'Archidekt');
+      });
+    }
+
+    if (moxfieldDirectBtn) {
+      moxfieldDirectBtn.addEventListener('click', () => {
+        handleCopyAndOpen('https://www.moxfield.com/decks/new', 'Moxfield');
+      });
+    }
+
+    generateDeckCommanderBtn.addEventListener('click', buildDeckAutomated);
+    generateDeckOathBtn.addEventListener('click', buildDeckAutomated);
+    rebuildCurrentDeckBtn.addEventListener('click', buildDeckAutomated);
+    viewDeckBtn.addEventListener('click', () => {
+      deckViewerModal.classList.remove('hidden');
+      renderDeckViewer();
+    });
+    closeDeckViewerBtn.addEventListener('click', () => { deckViewerModal.classList.add('hidden'); });
+    deckViewerBackdrop.addEventListener('click', () => { deckViewerModal.classList.add('hidden'); });
+    deckViewerExportBtn.addEventListener('click', () => {
+      deckViewerModal.classList.add('hidden');
+      openExportModal();
+    });
+
+    function evaluateDeckCompliance() {
+      state.deckViolations.clear();
+      if (!state.generatedDeck) return;
+
+      const deck = state.generatedDeck;
+      const cards = deck.cards || [];
+      const challenge = state.challengesEnabled ? state.currentChallenge : null;
+
+      if (!challenge) {
+        deckChallengeComplianceBar.className = 'p-3 rounded-xl border flex flex-wrap items-center justify-between gap-2.5 text-xs my-2 bg-slate-900/60 border-mtgBorder/60';
+        challengeComplianceIcon.className = 'w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 bg-slate-800 text-slate-300 border border-slate-700';
+        challengeComplianceIcon.innerHTML = '<i class="fa-solid fa-shield"></i>';
+        challengeComplianceTitle.textContent = 'Freeform Deck (No Active Challenge)';
+        challengeComplianceDetails.textContent = 'Built according to official MTG format deckbuilding rules.';
+        autoFixNonCompliantBtn.classList.add('hidden');
+        return;
+      }
+
+      const totalCost = cards.reduce((sum, c) => sum + (parseFloat(c.prices?.usd || 0) * (c.qty || 1)), 0);
+      const title = challenge.title;
+      let isCompliant = true;
+      let statusNote = '';
+
+      if (title.includes('Budget Under $50')) {
+        const cmdrCost = parseFloat(deck.leader?.prices?.usd || 0);
+        const libCost = totalCost - cmdrCost;
+        if (libCost > 50) {
+          isCompliant = false;
+          statusNote = `Over $50 cap ($${libCost.toFixed(2)} USD excluding Commander).`;
+          [...cards].filter(c => c.category !== 'Commander' && !c.type_line?.includes('Basic Land')).sort((a, b) => parseFloat(b.prices?.usd || 0) - parseFloat(a.prices?.usd || 0)).slice(0, 5).forEach(c => state.deckViolations.add(c.name));
+        } else {
+          statusNote = `✓ Under budget ($${libCost.toFixed(2)} / $50.00 USD).`;
+        }
+      } else if (title.includes('Penny Dreadful') || title.includes('< $0.50')) {
+        cards.forEach(c => {
+          if (c.category !== 'Commander' && !c.type_line?.includes('Basic Land')) {
+            if (parseFloat(c.prices?.usd || 0) >= 0.50) state.deckViolations.add(c.name);
+          }
+        });
+        isCompliant = (state.deckViolations.size === 0);
+        statusNote = isCompliant ? '✓ Every single card is under $0.50.' : `${state.deckViolations.size} card(s) exceed $0.50 cap.`;
+      } else if (title.includes('Ultra Budget')) {
+        if (totalCost > 25) {
+          isCompliant = false;
+          statusNote = `Over $25 cap ($${totalCost.toFixed(2)} USD total).`;
+          [...cards].filter(c => c.category !== 'Commander' && !c.type_line?.includes('Basic Land')).sort((a, b) => parseFloat(b.prices?.usd || 0) - parseFloat(a.prices?.usd || 0)).slice(0, 5).forEach(c => state.deckViolations.add(c.name));
+        } else {
+          statusNote = `✓ Under ultra budget ($${totalCost.toFixed(2)} / $25.00 USD).`;
+        }
+      } else if (title.includes('Permanents')) {
+        cards.forEach(c => {
+          if (c.category !== 'Commander' && c.category !== 'Signature Spell') {
+            const t = (c.type_line || '').toLowerCase();
+            if (t.includes('instant') || t.includes('sorcery')) state.deckViolations.add(c.name);
+          }
+        });
+        isCompliant = (state.deckViolations.size === 0);
+        statusNote = isCompliant ? '✓ 100% permanents in the 99.' : `${state.deckViolations.size} non-permanent spell(s) detected.`;
+      } else if (title.includes('Odd CMC')) {
+        cards.forEach(c => {
+          if (c.category !== 'Commander' && !c.type_line?.includes('Land')) {
+            if ((Math.round(c.cmc || 0) % 2) === 0) state.deckViolations.add(c.name);
+          }
+        });
+        isCompliant = (state.deckViolations.size === 0);
+        statusNote = isCompliant ? '✓ All spells have odd mana values.' : `${state.deckViolations.size} card(s) have even CMC.`;
+      } else if (title.includes('Even CMC')) {
+        cards.forEach(c => {
+          if (c.category !== 'Commander' && !c.type_line?.includes('Land')) {
+            if ((Math.round(c.cmc || 0) % 2) !== 0) state.deckViolations.add(c.name);
+          }
+        });
+        isCompliant = (state.deckViolations.size === 0);
+        statusNote = isCompliant ? '✓ All spells have even mana values.' : `${state.deckViolations.size} card(s) have odd CMC.`;
+      } else if (title.includes('Zero Tutors')) {
+        cards.forEach(c => {
+          const txt = (c.oracle_text || '').toLowerCase();
+          if (txt.includes('search your library') && !c.type_line?.includes('Land')) state.deckViolations.add(c.name);
+        });
+        isCompliant = (state.deckViolations.size === 0);
+        statusNote = isCompliant ? '✓ Zero library search effects in deck.' : `${state.deckViolations.size} tutor card(s) detected.`;
+      } else {
+        statusNote = `Synergized for: ${challenge.title}`;
+      }
+
+      if (isCompliant) {
+        deckChallengeComplianceBar.className = 'p-3 rounded-xl border flex flex-wrap items-center justify-between gap-2.5 text-xs my-2 bg-emerald-950/40 border-emerald-500/40';
+        challengeComplianceIcon.className = 'w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40';
+        challengeComplianceIcon.innerHTML = '<i class="fa-solid fa-check"></i>';
+        challengeComplianceTitle.className = 'font-semibold text-emerald-200 block';
+        challengeComplianceTitle.textContent = `Challenge Compliant: ${challenge.title}`;
+        challengeComplianceDetails.textContent = statusNote;
+        autoFixNonCompliantBtn.classList.add('hidden');
+      } else {
+        deckChallengeComplianceBar.className = 'p-3 rounded-xl border flex flex-wrap items-center justify-between gap-2.5 text-xs my-2 bg-amber-950/40 border-amber-500/40';
+        challengeComplianceIcon.className = 'w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 bg-amber-500/20 text-amber-400 border border-amber-500/40';
+        challengeComplianceIcon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+        challengeComplianceTitle.className = 'font-semibold text-amber-200 block';
+        challengeComplianceTitle.textContent = `Constraint Warning: ${challenge.title}`;
+        challengeComplianceDetails.textContent = statusNote;
+        autoFixCount.textContent = state.deckViolations.size;
+        autoFixNonCompliantBtn.classList.remove('hidden');
+        autoFixNonCompliantBtn.classList.add('flex');
+      }
+    }
+
+    async function swapSingleCard(cardNameToSwap) {
+      if (state.isSwappingCard || !state.generatedDeck) return;
+      state.isSwappingCard = true;
+
+      const deck = state.generatedDeck;
+      const targetIdx = deck.cards.findIndex(c => c.name === cardNameToSwap);
+      if (targetIdx === -1) {
+        state.isSwappingCard = false;
+        return;
+      }
+
+      const oldCard = deck.cards[targetIdx];
+      const colors = (deck.leader?.color_identity && deck.leader.color_identity.length > 0) ? deck.leader.color_identity : [];
+      const idQuery = (colors.length === 0) ? 'identity=colorless' : `identity<=${colors.join('')}`;
+      const isEDH = (state.format === 'commander');
+      const challengeAddon = getChallengeScryfallFilters();
+
+      let catTerms = '';
+      if (oldCard.category === 'Ramp & Rocks') catTerms = '(o:"add {" or o:"search your library for a" and o:"land") (t:artifact or t:creature or t:sorcery) cmc<=3';
+      else if (oldCard.category === 'Card Draw') catTerms = '(o:"draw a card" or o:"draws a card" or o:"draw cards") cmc<=4';
+      else if (oldCard.category === 'Interaction & Removal') catTerms = '(o:"destroy" or o:"exile target" or o:"counter target") cmc<=4';
+      else if (oldCard.type_line?.includes('Creature')) catTerms = 't:creature';
+      else catTerms = '(t:artifact or t:enchantment or t:instant or t:sorcery)';
+
+      const existingNames = new Set(deck.cards.map(c => c.name.split(' // ')[0]));
+      const searchUrl = `https://api.scryfall.com/cards/search?q=${encodeURIComponent(`format:${isEDH ? 'commander' : 'oathbreaker'} ${idQuery} ${catTerms} ${challengeAddon} -name:"${oldCard.name.replace(/"/g, '')}"`)}&order=edhrec`;
+
+      try {
+        playDiceSound();
+        showToast(`Searching replacement for ${oldCard.name}...`);
+        const res = await fetch(searchUrl);
+        if (!res.ok) throw new Error('No substitute card found on Scryfall.');
+        const data = await res.json();
+        const candidateList = (data.data || []).filter(c => !existingNames.has(c.name.split(' // ')[0]));
+
+        if (candidateList.length === 0) throw new Error('All potential substitutes are already in your deck.');
+
+        const replacementCard = candidateList[Math.floor(Math.random() * Math.min(candidateList.length, 6))];
+        deck.cards[targetIdx] = { ...replacementCard, category: oldCard.category, qty: oldCard.qty || 1 };
+        state.deckViolations.delete(oldCard.name);
+        renderDeckViewer();
+        showToast(`Swapped: ${replacementCard.name}!`);
+      } catch (err) {
+        showToast(err.message || 'Substitution failed.');
+      } finally {
+        state.isSwappingCard = false;
+      }
+    }
+
+    async function autoFixNonCompliantCards() {
+      if (state.isSwappingCard || !state.generatedDeck) return;
+      const violations = Array.from(state.deckViolations);
+      if (violations.length === 0) {
+        showToast('All cards are already compliant!');
+        return;
+      }
+      showToast(`Auto-fixing ${violations.length} non-compliant card(s)...`);
+      for (const cardName of violations) {
+        await swapSingleCard(cardName);
+      }
+      evaluateDeckCompliance();
+      showToast('Finished auto-fixing non-compliant cards!');
+    }
+
+    autoFixNonCompliantBtn.addEventListener('click', autoFixNonCompliantCards);
+
+    function getRandomPodChallenge() {
+      const allChallenges = [
+        ...CHALLENGE_POOLS.budget,
+        ...CHALLENGE_POOLS.mechanics,
+        ...CHALLENGE_POOLS.flavor,
+        ...CHALLENGE_POOLS.bracket
+      ];
+      return allChallenges[Math.floor(Math.random() * allChallenges.length)];
+    }
+
+    async function generateMultiplayerPod() {
+      if (state.isGeneratingPod) return;
+      state.isGeneratingPod = true;
+      playDiceSound();
+
+      podLoadingArea.classList.remove('hidden');
+      podSeatsGrid.classList.add('hidden');
+      rollEntirePodBtn.disabled = true;
+
+      const isEDH = (state.format === 'commander');
+      podActiveFormatBadge.textContent = isEDH ? 'Commander (EDH)' : 'Oathbreaker';
+
+      const seats = [];
+      const usedIdentities = new Set();
+      const usedNames = new Set();
+
+      for (let i = 1; i <= state.podSize; i++) {
+        let card = null;
+        let sigSpell = null;
+        let attempts = 0;
+
+        while (attempts < 6) {
+          attempts++;
+          try {
+            let colorConstraint = '';
+            if (state.podDiverseColors && usedIdentities.size > 0 && attempts <= 3) {
+              const avoidColors = Array.from(usedIdentities).join('');
+              if (avoidColors.length <= 4) colorConstraint = `-identity=${avoidColors}`;
+            }
+
+            if (isEDH) {
+              const query = `is:commander legal:commander ${colorConstraint} ${state.excludeUnsets ? '-is:funny -is:silverbordered' : ''}`;
+              const res = await fetch(`https://api.scryfall.com/cards/random?q=${encodeURIComponent(query)}`);
+              if (res.ok) {
+                const candidate = await res.json();
+                if (!usedNames.has(candidate.name)) {
+                  card = candidate;
+                  break;
+                }
+              }
+            } else {
+              const pwQuery = `t:planeswalker legal:oathbreaker ${colorConstraint} ${state.excludeUnsets ? '-is:funny -is:silverbordered' : ''}`;
+              const pwRes = await fetch(`https://api.scryfall.com/cards/random?q=${encodeURIComponent(pwQuery)}`);
+              if (pwRes.ok) {
+                const candidatePw = await pwRes.json();
+                const pwColors = candidatePw.color_identity && candidatePw.color_identity.length > 0 ? candidatePw.color_identity.join('') : '';
+                const idConstraint = pwColors ? `identity<=${pwColors}` : 'identity=colorless';
+                const spellQuery = `(t:instant or t:sorcery) legal:oathbreaker ${idConstraint} ${state.excludeUnsets ? '-is:funny -is:silverbordered' : ''}`;
+                const spellRes = await fetch(`https://api.scryfall.com/cards/random?q=${encodeURIComponent(spellQuery)}`);
+                if (spellRes.ok) {
+                  const candidateSpell = await spellRes.json();
+                  if (!usedNames.has(candidatePw.name)) {
+                    card = candidatePw;
+                    sigSpell = candidateSpell;
+                    break;
+                  }
+                }
+              }
+            }
+          } catch (e) {
+            console.warn('Pod seat roll attempt error:', e);
+          }
+        }
+
+        if (card) {
+          usedNames.add(card.name);
+          const id = (card.color_identity && card.color_identity.length > 0) ? card.color_identity.sort().join('') : 'C';
+          usedIdentities.add(id);
+
+          seats.push({
+            playerNumber: i,
+            card: card,
+            signatureSpell: sigSpell,
+            challenge: state.podAssignChallenges ? getRandomPodChallenge() : null,
+            isFlipped: false
+          });
+        }
+      }
+
+      state.podSeats = seats;
+      state.isGeneratingPod = false;
+      podLoadingArea.classList.add('hidden');
+      podSeatsGrid.classList.remove('hidden');
+      rollEntirePodBtn.disabled = false;
+
+      renderPodGrid();
+      showToast(`Summoned ${seats.length}-Player Pod!`);
+    }
+
+    async function rerollSinglePodSeat(playerNumber) {
+      const idx = state.podSeats.findIndex(s => s.playerNumber === playerNumber);
+      if (idx === -1) return;
+      playDiceSound();
+      showToast(`Rolling new seat for Player ${playerNumber}...`);
+
+      const isEDH = (state.format === 'commander');
+      try {
+        if (isEDH) {
+          const res = await fetch(`https://api.scryfall.com/cards/random?q=${encodeURIComponent(`is:commander legal:commander ${state.excludeUnsets ? '-is:funny -is:silverbordered' : ''}`)}`);
+          if (!res.ok) throw new Error('Could not fetch replacement commander.');
+          const newCard = await res.json();
+          state.podSeats[idx].card = newCard;
+          if (state.podAssignChallenges) state.podSeats[idx].challenge = getRandomPodChallenge();
+        } else {
+          const pwRes = await fetch(`https://api.scryfall.com/cards/random?q=${encodeURIComponent(`t:planeswalker legal:oathbreaker ${state.excludeUnsets ? '-is:funny -is:silverbordered' : ''}`)}`);
+          if (!pwRes.ok) throw new Error('Could not fetch replacement planeswalker.');
+          const newPw = await pwRes.json();
+          const pwColors = newPw.color_identity && newPw.color_identity.length > 0 ? newPw.color_identity.join('') : '';
+          const idConstraint = pwColors ? `identity<=${pwColors}` : 'identity=colorless';
+          const spellRes = await fetch(`https://api.scryfall.com/cards/random?q=${encodeURIComponent(`(t:instant or t:sorcery) legal:oathbreaker ${idConstraint} ${state.excludeUnsets ? '-is:funny -is:silverbordered' : ''}`)}`);
+          if (!spellRes.ok) throw new Error('Could not fetch signature spell.');
+          const newSpell = await spellRes.json();
+          state.podSeats[idx].card = newPw;
+          state.podSeats[idx].signatureSpell = newSpell;
+          if (state.podAssignChallenges) state.podSeats[idx].challenge = getRandomPodChallenge();
+        }
+        renderPodGrid();
+        showToast(`Player ${playerNumber} updated!`);
+      } catch (err) {
+        showToast(err.message || 'Seat reroll failed.');
+      }
+    }
+
+    function renderPodGrid() {
+      podSeatsGrid.innerHTML = '';
+      if (!state.podSeats || state.podSeats.length === 0) {
+        podSeatsGrid.innerHTML = `
+          <div class="col-span-full py-16 text-center text-slate-500 text-xs">
+            <i class="fa-solid fa-users text-3xl mb-3 block text-slate-600"></i>
+            Click "Summon Pod Seats" to generate your table.
+          </div>
+        `;
+        return;
+      }
+
+      if (state.podSize === 2) {
+        podSeatsGrid.className = 'flex-1 overflow-y-auto my-4 grid grid-cols-1 md:grid-cols-2 gap-5 p-1 max-w-4xl mx-auto w-full';
+      } else if (state.podSize === 3) {
+        podSeatsGrid.className = 'flex-1 overflow-y-auto my-4 grid grid-cols-1 md:grid-cols-3 gap-4 p-1';
+      } else {
+        podSeatsGrid.className = 'flex-1 overflow-y-auto my-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 p-1';
+      }
+
+      const playerColors = ['from-amber-500', 'from-blue-500', 'from-emerald-500', 'from-purple-500'];
+
+      state.podSeats.forEach((seat, idx) => {
+        const c = seat.card;
+        const sig = seat.signatureSpell;
+        const ch = seat.challenge;
+        const colorGrad = playerColors[idx % playerColors.length];
+
+        const seatCard = document.createElement('div');
+        seatCard.className = 'bg-slate-900/90 border border-mtgBorder/80 rounded-2xl p-4 flex flex-col justify-between shadow-xl relative hover:border-slate-600 transition group';
+
+        const imgSrc = c.image_uris?.large || c.image_uris?.normal || c.card_faces?.[0]?.image_uris?.normal || 'https://placehold.co/488x680/151922/e5c158?text=Card';
+        const colors = (c.color_identity && c.color_identity.length > 0) ? c.color_identity : ['C'];
+
+        let colorBadgesHtml = '';
+        colors.forEach(col => {
+          const cfg = MANA_MAP[col] || MANA_MAP['C'];
+          colorBadgesHtml += `<span class="w-4 h-4 rounded-full text-[9px] font-bold flex items-center justify-center shadow ${cfg.bg} ${cfg.text}">${cfg.label}</span>`;
+        });
+
+        seatCard.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between pb-2.5 mb-2.5 border-b border-mtgBorder/60">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-lg bg-gradient-to-tr ${colorGrad} to-slate-800 text-white font-title text-xs font-bold flex items-center justify-center shadow">
+                  P${seat.playerNumber}
+                </span>
+                <span class="text-xs font-bold font-title text-slate-200">Player ${seat.playerNumber}</span>
+              </div>
+              <div class="flex items-center gap-1">${colorBadgesHtml}</div>
+            </div>
+
+            <div class="w-full aspect-[5/7] max-h-56 mx-auto rounded-xl overflow-hidden shadow-md border border-slate-700/60 bg-slate-950 mb-3 relative group/img cursor-pointer">
+              <img src="${imgSrc}" alt="${c.name}" class="w-full h-full object-cover group-hover/img:scale-105 transition duration-300">
+              <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity flex items-end p-2.5">
+                <span class="text-[11px] text-amber-200 font-mono font-bold">${c.mana_cost || ''}</span>
+              </div>
+            </div>
+
+            <h4 class="font-title font-bold text-sm text-amber-100 truncate" title="${c.name}">${c.name}</h4>
+            <p class="text-[11px] text-slate-400 truncate mb-1">${c.type_line}</p>
+            ${sig ? `
+              <div class="p-1.5 rounded-lg bg-purple-950/40 border border-purple-500/30 text-[11px] text-purple-200 flex items-center justify-between mt-1 mb-2">
+                <span class="truncate font-medium"><i class="fa-solid fa-wand-magic-sparkles text-cyan-400 mr-1"></i>${sig.name}</span>
+                <span class="font-mono text-[10px] text-purple-300">${sig.mana_cost || ''}</span>
+              </div>
+            ` : ''}
+
+            ${ch ? `
+              <div class="mt-2.5 p-2 rounded-xl bg-black/40 border border-amber-500/20 text-[10px] space-y-0.5">
+                <div class="flex items-center justify-between text-amber-300 font-semibold uppercase tracking-wider">
+                  <span class="flex items-center gap-1"><i class="fa-solid ${ch.icon} text-[9px]"></i> ${ch.title}</span>
+                </div>
+                <p class="text-slate-400 line-clamp-2 text-[10px] leading-tight">${ch.description}</p>
+              </div>
+            ` : ''}
+          </div>
+
+          <div class="mt-3 pt-3 border-t border-mtgBorder/60 flex items-center gap-1.5">
+            <button class="load-seat-btn flex-1 py-1.5 px-2 rounded-lg bg-gradient-to-r from-emerald-600/80 to-teal-600/80 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-[11px] transition flex items-center justify-center gap-1 shadow-sm" title="Inspect & Auto-Build 100-Card Deck">
+              <i class="fa-solid fa-layer-group text-[10px]"></i>
+              <span>Build Deck</span>
+            </button>
+            <button class="reroll-seat-btn p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-amber-300 border border-mtgBorder transition" title="Reroll Player ${seat.playerNumber}">
+              <i class="fa-solid fa-arrows-rotate text-xs"></i>
+            </button>
+            <a href="${c.scryfall_uri}" target="_blank" rel="noopener" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-amber-300 border border-mtgBorder transition" title="Scryfall">
+              <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+            </a>
+          </div>
+        `;
+
+        seatCard.querySelector('.reroll-seat-btn').addEventListener('click', (e) => {
+          e.stopPropagation();
+          rerollSinglePodSeat(seat.playerNumber);
+        });
+
+        seatCard.querySelector('.load-seat-btn').addEventListener('click', () => {
+          loadPodSeatIntoMain(seat);
+        });
+
+        podSeatsGrid.appendChild(seatCard);
+      });
+    }
+
+    function loadPodSeatIntoMain(seat) {
+      podModal.classList.add('hidden');
+      if (state.format === 'commander') {
+        renderCommanderDisplay(seat.card);
+      } else {
+        renderOathbreakerDisplay(seat.card, seat.signatureSpell);
+      }
+      if (seat.challenge) {
+        state.currentChallenge = seat.challenge;
+        state.challengesEnabled = true;
+        challengesEnabledToggle.checked = true;
+        renderActiveChallenge();
+      }
+      buildDeckAutomated();
+      showToast(`Loaded Player ${seat.playerNumber}'s deck into synthesis engine!`);
+    }
+
+    function copyPodSummary() {
+      if (!state.podSeats || state.podSeats.length === 0) {
+        showToast('Generate a pod first!');
+        return;
+      }
+      let summary = `=== MTG ${state.podSize}-PLAYER POD SEATS (${state.format.toUpperCase()}) ===\n\n`;
+      state.podSeats.forEach(s => {
+        summary += `[Player ${s.playerNumber}]\n`;
+        summary += `Commander: ${s.card.name} (${(s.card.color_identity || []).join('') || 'C'})\n`;
+        if (s.signatureSpell) summary += `Signature Spell: ${s.signatureSpell.name}\n`;
+        if (s.challenge) summary += `Challenge: ${s.challenge.title} (${s.challenge.description})\n`;
+        summary += `Scryfall: ${s.card.scryfall_uri}\n\n`;
+      });
+      copyToClipboard(summary.trim(), `Copied ${state.podSize}-Player Pod roster to clipboard!`);
+    }
+
+    podModalTriggerBtn.addEventListener('click', () => {
+      podModal.classList.remove('hidden');
+      if (state.podSeats.length === 0) generateMultiplayerPod();
+    });
+    closePodModalBtn.addEventListener('click', () => podModal.classList.add('hidden'));
+    podModalBackdrop.addEventListener('click', () => podModal.classList.add('hidden'));
+    rollEntirePodBtn.addEventListener('click', generateMultiplayerPod);
+    copyPodSummaryBtn.addEventListener('click', copyPodSummary);
+
+    document.querySelectorAll('.pod-size-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        playDiceSound();
+        document.querySelectorAll('.pod-size-btn').forEach(b => {
+          b.className = 'pod-size-btn px-3 py-1.5 rounded-lg font-semibold transition text-slate-400 hover:text-white';
+        });
+        btn.className = 'pod-size-btn px-3.5 py-1.5 rounded-lg font-bold transition bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 shadow';
+        state.podSize = parseInt(btn.getAttribute('data-podsize'), 10);
+        generateMultiplayerPod();
+      });
+    });
+
+    podUniqueColorsToggle.addEventListener('change', (e) => { state.podDiverseColors = e.target.checked; });
+    podAssignChallengesToggle.addEventListener('change', (e) => { state.podAssignChallenges = e.target.checked; });
+
+    function buildScryfallQuery() {
+      const parts = [];
+      if (state.format === 'commander') {
+        parts.push('is:commander', 'legal:commander');
+        if (state.commanderType === 'creature') parts.push('t:creature');
+        else if (state.commanderType === 'planeswalker') parts.push('t:planeswalker');
+        else if (state.commanderType === 'partner') parts.push('(o:partner or o:"friends forever")');
+        else if (state.commanderType === 'background') parts.push('o:"choose a background"');
+      } else {
+        parts.push('t:planeswalker', 'legal:oathbreaker');
+      }
+
+      const selectedArr = Array.from(state.selectedColors).filter(c => c !== 'C');
+      const hasColorless = state.selectedColors.has('C');
+
+      if (hasColorless && selectedArr.length === 0) {
+        parts.push('identity=colorless');
+      } else if (selectedArr.length > 0) {
+        const colorStr = selectedArr.join('');
+        if (state.colorLogic === 'exact') parts.push(`identity=${colorStr}`);
+        else if (state.colorLogic === 'atmost') parts.push(`identity<=${colorStr}`);
+        else if (state.colorLogic === 'atleast') parts.push(`identity>=${colorStr}`);
+      }
+
+      if (state.colorCount !== 'any') parts.push(`colors=${state.colorCount}`);
+      if (state.budgetOnly) parts.push('usd<5.00');
+      if (state.excludeUnsets) parts.push('-is:funny', '-is:silverbordered');
+
+      const q = parts.join(' ');
+      if (queryPreview) queryPreview.textContent = q || 'is:commander';
+      return q;
+    }
+
+    function setFormatMode(mode) {
+      if (state.format === mode) return;
+      state.format = mode;
+      playDiceSound();
+
+      if (mode === 'commander') {
+        modeCommanderBtn.className = 'flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide uppercase transition-all bg-gradient-to-r from-amber-500/20 to-yellow-500/20 text-amber-300 border border-amber-500/40 shadow';
+        modeOathbreakerBtn.className = 'flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide uppercase text-slate-400 hover:text-slate-200 transition-all';
+        formatHeaderTitle.textContent = 'COMMANDER COIN';
+        formatSubtitle.textContent = 'Scryfall MTG EDH & Oathbreaker Randomizer';
+        formatLogoIcon.className = 'fa-solid fa-crown text-lg';
+        filterFormatTag.textContent = 'Commander Mode';
+        randomizeBtnText.textContent = 'Summon Commander';
+        randomizeBtnIcon.className = 'fa-solid fa-dice-d20 text-xl group-hover:rotate-45 transition-transform duration-300';
+        
+        commanderTypeContainer.classList.remove('hidden');
+        oathbreakerSpellContainer.classList.add('hidden');
+        oathbreakerRerollGroup.classList.add('hidden');
+        commanderShowcase.classList.remove('hidden');
+        oathbreakerShowcase.classList.add('hidden');
+
+        formatInfoBox.innerHTML = `
+          <p class="flex items-center gap-2 font-medium text-amber-300 mb-1">
+            <i class="fa-solid fa-circle-info"></i> Commander (EDH) Rules
+          </p>
+          Requires a 100-card singleton deck led by a Legendary Creature (or specific Planeswalker). Color identity guides all 99 deck cards.
+        `;
+      } else {
+        modeOathbreakerBtn.className = 'flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide uppercase transition-all bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20 text-purple-300 border border-purple-500/40 shadow';
+        modeCommanderBtn.className = 'flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide uppercase text-slate-400 hover:text-slate-200 transition-all';
+        formatHeaderTitle.textContent = 'OATHBREAKER ORACLE';
+        formatSubtitle.textContent = 'Planeswalker & Signature Spell Randomizer';
+        formatLogoIcon.className = 'fa-solid fa-bolt text-lg';
+        filterFormatTag.textContent = 'Oathbreaker Mode';
+        randomizeBtnText.textContent = 'Forge Oathbreaker Pair';
+        randomizeBtnIcon.className = 'fa-solid fa-wand-magic-sparkles text-xl group-hover:rotate-45 transition-transform duration-300';
+
+        commanderTypeContainer.classList.add('hidden');
+        oathbreakerSpellContainer.classList.remove('hidden');
+        oathbreakerRerollGroup.classList.remove('hidden');
+        oathbreakerRerollGroup.classList.add('grid');
+        commanderShowcase.classList.add('hidden');
+        oathbreakerShowcase.classList.remove('hidden');
+
+        formatInfoBox.innerHTML = `
+          <p class="flex items-center gap-2 font-medium text-purple-300 mb-1">
+            <i class="fa-solid fa-circle-info"></i> Oathbreaker Rules
+          </p>
+          Requires a 60-card singleton deck led by a Planeswalker plus a Signature Spell (Instant or Sorcery) within its color identity.
+        `;
+      }
+
+      state.generatedDeck = null;
+      updateViewDeckButton();
+      buildScryfallQuery();
+    }
+
+    function toggleCardFlip() {
+      state.isFlipped = !state.isFlipped;
+      if (state.isFlipped) flipper.classList.add('flipped');
+      else flipper.classList.remove('flipped');
+    }
+
+    if (cardImageContainer) cardImageContainer.addEventListener('click', toggleCardFlip);
+    if (flipBtn) flipBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleCardFlip(); });
+
+    function renderCommanderDisplay(card) {
+      if (!card) return;
+      state.currentCard = card;
+      state.isFlipped = false;
+      flipper.classList.remove('flipped');
+
+      const isDfc = (card.card_faces && card.card_faces.length > 1 && card.card_faces[0].image_uris);
+      if (isDfc) {
+        const face1 = card.card_faces[0];
+        const face2 = card.card_faces[1];
+        cardImgFront.src = face1.image_uris?.large || face1.image_uris?.normal || '';
+        cardImgBack.src = face2.image_uris?.large || face2.image_uris?.normal || '';
+        flipBtn.classList.remove('hidden');
+        flipBtn.classList.add('flex');
+        cardName.textContent = card.name;
+        cardManaCost.textContent = face1.mana_cost || '';
+        cardTypeLine.textContent = face1.type_line || card.type_line;
+        cardOracleText.textContent = `${face1.name}:\n${face1.oracle_text || ''}\n\n${face2.name}:\n${face2.oracle_text || ''}`;
+      } else {
+        const imgUrl = card.image_uris?.large || card.image_uris?.normal || 'https://placehold.co/488x680/151922/e5c158?text=Card+Image';
+        cardImgFront.src = imgUrl;
+        cardImgBack.src = '';
+        flipBtn.classList.add('hidden');
+        cardName.textContent = card.name;
+        cardManaCost.textContent = card.mana_cost || '';
+        cardTypeLine.textContent = card.type_line || '';
+        cardOracleText.textContent = card.oracle_text || 'No rules text printed.';
+      }
+
+      rarityPill.textContent = (card.rarity || 'Mythic').toUpperCase();
+      setInfoPill.textContent = `SET: ${(card.set || 'EDH').toUpperCase()} #${card.collector_number || '001'}`;
+
+      if (card.power !== undefined && card.toughness !== undefined) {
+        cardStats.textContent = `${card.power} / ${card.toughness}`;
+      } else if (card.loyalty) {
+        cardStats.textContent = `Loyalty: ${card.loyalty}`;
+      } else {
+        cardStats.textContent = '';
+      }
+
+      cardArtist.textContent = card.artist ? `Illus. ${card.artist}` : '';
+      cardPrice.textContent = card.prices?.usd ? `$${card.prices.usd} USD` : 'N/A';
+
+      scryfallLink.href = card.scryfall_uri || `https://scryfall.com/search?q=${encodeURIComponent(card.name)}`;
+      edhrecLink.href = `https://edhrec.com/commanders/${card.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
+
+      colorIdentityBadges.innerHTML = '';
+      const colors = card.color_identity && card.color_identity.length > 0 ? card.color_identity : ['C'];
+      colors.forEach(col => {
+        const cfg = MANA_MAP[col] || MANA_MAP['C'];
+        const badge = document.createElement('span');
+        badge.className = `w-6 h-6 rounded-full font-bold text-xs flex items-center justify-center shadow ${cfg.bg} ${cfg.text}`;
+        badge.textContent = cfg.label;
+        colorIdentityBadges.appendChild(badge);
+      });
+
+      updateFavoriteButtonUI();
+      addToHistory({ type: 'commander', card: card, timestamp: Date.now() });
+    }
+
+    function renderOathbreakerDisplay(pw, spell) {
+      if (!pw || !spell) return;
+      state.currentOathPair = { planeswalker: pw, spell: spell };
+
+      const pwImgSrc = pw.image_uris?.large || pw.image_uris?.normal || (pw.card_faces?.[0]?.image_uris?.normal) || '';
+      pwImg.src = pwImgSrc;
+      pwName.textContent = pw.name;
+      pwType.textContent = pw.type_line;
+      pwManaCost.textContent = pw.mana_cost || '';
+      pwOracle.textContent = pw.oracle_text || (pw.card_faces?.[0]?.oracle_text) || '';
+      pwLoyalty.textContent = pw.loyalty ? `Loyalty: ${pw.loyalty}` : 'Planeswalker';
+      pwScryfallLink.href = pw.scryfall_uri || '#';
+      pwOathLink.href = `https://oathbreaker.gg/oathbreakers/${pw.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
+
+      const spellImgSrc = spell.image_uris?.large || spell.image_uris?.normal || '';
+      spellImg.src = spellImgSrc;
+      spellName.textContent = spell.name;
+      spellType.textContent = spell.type_line;
+      spellManaCost.textContent = spell.mana_cost || '';
+      spellOracle.textContent = spell.oracle_text || '';
+      spellPrice.textContent = spell.prices?.usd ? `$${spell.prices.usd} USD` : '$0.00 USD';
+      spellScryfallLink.href = spell.scryfall_uri || '#';
+      spellEdhrecLink.href = `https://edhrec.com/cards/${spell.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
+
+      const id = pw.color_identity && pw.color_identity.length > 0 ? pw.color_identity.join('') : 'Colorless';
+      oathIdentityPill.textContent = `Identity: ${id}`;
+
+      updateFavoriteButtonUI();
+      addToHistory({ type: 'oathbreaker', planeswalker: pw, spell: spell, timestamp: Date.now() });
+    }
+
+    async function fetchRandomCommander() {
+      const q = buildScryfallQuery();
+      loadingState.classList.remove('hidden');
+      errorState.classList.add('hidden');
+      commanderShowcase.classList.add('hidden');
+
+      try {
+        playDiceSound();
+        if (state.challengesEnabled && !state.challengeLocked) rollNewChallenge();
+
+        const res = await fetch(`https://api.scryfall.com/cards/random?q=${encodeURIComponent(q)}`);
+        if (!res.ok) throw new Error('No commander matched your search filter criteria.');
+        const card = await res.json();
+
+        loadingState.classList.add('hidden');
+        commanderShowcase.classList.remove('hidden');
+        commanderShowcase.classList.add('animate-reveal');
+        renderCommanderDisplay(card);
+        state.generatedDeck = null;
+        updateViewDeckButton();
+      } catch (err) {
+        loadingState.classList.add('hidden');
+        errorMessage.textContent = err.message || 'No matching cards found. Try broadening your color logic.';
+        errorState.classList.remove('hidden');
+      }
+    }
+
+    async function fetchRandomOathbreakerPair() {
+      const pwQuery = buildScryfallQuery();
+      loadingState.classList.remove('hidden');
+      errorState.classList.add('hidden');
+      oathbreakerShowcase.classList.add('hidden');
+
+      try {
+        playDiceSound();
+        if (state.challengesEnabled && !state.challengeLocked) rollNewChallenge();
+
+        const pwRes = await fetch(`https://api.scryfall.com/cards/random?q=${encodeURIComponent(pwQuery)}`);
+        if (!pwRes.ok) throw new Error('Could not find a legal Oathbreaker Planeswalker with these filters.');
+        const pw = await pwRes.json();
+
+        const pwColors = pw.color_identity && pw.color_identity.length > 0 ? pw.color_identity.join('') : '';
+        const idConstraint = pwColors ? `identity<=${pwColors}` : 'identity=colorless';
+        let spellTypeQ = '(t:instant or t:sorcery)';
+        if (state.oathSpellType === 'instant') spellTypeQ = 't:instant';
+        if (state.oathSpellType === 'sorcery') spellTypeQ = 't:sorcery';
+
+        const spellQuery = `${spellTypeQ} legal:oathbreaker ${idConstraint} ${state.excludeUnsets ? '-is:funny -is:silverbordered' : ''}`;
+        const spellRes = await fetch(`https://api.scryfall.com/cards/random?q=${encodeURIComponent(spellQuery)}`);
+        if (!spellRes.ok) throw new Error('Found Planeswalker, but no legal Signature Spell exists in this color identity.');
+        const spell = await spellRes.json();
+
+        loadingState.classList.add('hidden');
+        oathbreakerShowcase.classList.remove('hidden');
+        oathbreakerShowcase.classList.add('animate-reveal');
+        renderOathbreakerDisplay(pw, spell);
+        state.generatedDeck = null;
+        updateViewDeckButton();
+      } catch (err) {
+        loadingState.classList.add('hidden');
+        errorMessage.textContent = err.message || 'Failed to roll Oathbreaker pair.';
+        errorState.classList.remove('hidden');
+      }
+    }
+
+    async function rerollOathbreakerOnly() {
+      if (state.format !== 'oathbreaker') return;
+      playDiceSound();
+      showToast('Rolling new Planeswalker...');
+      try {
+        const pwQuery = buildScryfallQuery();
+        const pwRes = await fetch(`https://api.scryfall.com/cards/random?q=${encodeURIComponent(pwQuery)}`);
+        if (!pwRes.ok) throw new Error('No matching Planeswalker found.');
+        const pw = await pwRes.json();
+
+        let currentSpell = state.currentOathPair?.spell;
+        const pwColors = new Set(pw.color_identity || []);
+        const spellColors = currentSpell?.color_identity || [];
+        const isLegal = spellColors.every(c => pwColors.has(c));
+
+        if (!currentSpell || !isLegal) {
+          const pwColStr = Array.from(pwColors).join('');
+          const idConstraint = pwColStr ? `identity<=${pwColStr}` : 'identity=colorless';
+          const spellRes = await fetch(`https://api.scryfall.com/cards/random?q=${encodeURIComponent(`(t:instant or t:sorcery) legal:oathbreaker ${idConstraint}`)}`);
+          if (spellRes.ok) currentSpell = await spellRes.json();
+        }
+
+        renderOathbreakerDisplay(pw, currentSpell);
+        showToast('Updated Planeswalker!');
+      } catch (e) {
+        showToast(e.message || 'Failed to reroll Planeswalker.');
+      }
+    }
+
+    async function rerollSignatureSpellOnly() {
+      if (state.format !== 'oathbreaker' || !state.currentOathPair?.planeswalker) return;
+      playDiceSound();
+      showToast('Rolling new Signature Spell...');
+      try {
+        const pw = state.currentOathPair.planeswalker;
+        const pwColors = pw.color_identity && pw.color_identity.length > 0 ? pw.color_identity.join('') : '';
+        const idConstraint = pwColors ? `identity<=${pwColors}` : 'identity=colorless';
+        let spellTypeQ = '(t:instant or t:sorcery)';
+        if (state.oathSpellType === 'instant') spellTypeQ = 't:instant';
+        if (state.oathSpellType === 'sorcery') spellTypeQ = 't:sorcery';
+
+        const spellRes = await fetch(`https://api.scryfall.com/cards/random?q=${encodeURIComponent(`${spellTypeQ} legal:oathbreaker ${idConstraint} ${state.excludeUnsets ? '-is:funny -is:silverbordered' : ''}`)}`);
+        if (!spellRes.ok) throw new Error('No signature spells found.');
+        const spell = await spellRes.json();
+        renderOathbreakerDisplay(pw, spell);
+        showToast('Updated Signature Spell!');
+      } catch (e) {
+        showToast(e.message || 'Failed to reroll spell.');
+      }
+    }
+
+    function updateCounts() {
+      savedCountBadge.textContent = state.favorites.length;
+      favTabCount.textContent = state.favorites.length;
+      histTabCount.textContent = state.history.length;
+    }
+
+    function addToHistory(item) {
+      state.history.unshift(item);
+      if (state.history.length > 40) state.history.pop();
+      localStorage.setItem('mtg_rolls_history', JSON.stringify(state.history));
+      updateCounts();
+    }
+
+    function isCurrentSaved() {
+      if (state.format === 'commander') {
+        if (!state.currentCard) return false;
+        return state.favorites.some(f => f.type === 'commander' && f.card.name === state.currentCard.name);
+      } else {
+        if (!state.currentOathPair) return false;
+        return state.favorites.some(f => f.type === 'oathbreaker' && f.planeswalker.name === state.currentOathPair.planeswalker.name && f.spell.name === state.currentOathPair.spell.name);
+      }
+    }
+
+    function updateFavoriteButtonUI() {
+      const saved = isCurrentSaved();
+      const starIcon = toggleFavoriteBtn.querySelector('i');
+      if (starIcon) starIcon.className = saved ? 'fa-solid fa-star text-amber-400' : 'fa-regular fa-star text-slate-300';
+      const starOathIcon = toggleFavoriteOathBtn.querySelector('i');
+      if (starOathIcon) starOathIcon.className = saved ? 'fa-solid fa-star text-purple-400' : 'fa-regular fa-star text-slate-300';
+    }
+
+    function toggleFavorite() {
+      playDiceSound();
+      if (state.format === 'commander') {
+        if (!state.currentCard) return;
+        const idx = state.favorites.findIndex(f => f.type === 'commander' && f.card.name === state.currentCard.name);
+        if (idx >= 0) {
+          state.favorites.splice(idx, 1);
+          showToast('Removed Commander from Favorites.');
+        } else {
+          state.favorites.unshift({ type: 'commander', card: state.currentCard, timestamp: Date.now() });
+          showToast('Added Commander to Favorites!');
+        }
+      } else {
+        if (!state.currentOathPair) return;
+        const idx = state.favorites.findIndex(f => f.type === 'oathbreaker' && f.planeswalker.name === state.currentOathPair.planeswalker.name && f.spell.name === state.currentOathPair.spell.name);
+        if (idx >= 0) {
+          state.favorites.splice(idx, 1);
+          showToast('Removed Oathbreaker pair from Favorites.');
+        } else {
+          state.favorites.unshift({ type: 'oathbreaker', planeswalker: state.currentOathPair.planeswalker, spell: state.currentOathPair.spell, timestamp: Date.now() });
+          showToast('Added Oathbreaker pair to Favorites!');
+        }
+      }
+
+      localStorage.setItem('mtg_rolls_favorites', JSON.stringify(state.favorites));
+      updateCounts();
+      updateFavoriteButtonUI();
+      if (!drawer.classList.contains('translate-x-full')) renderDrawerList();
+    }
+
+    function renderDrawerList() {
+      drawerListContainer.innerHTML = '';
+      const list = state.activeTab === 'favorites' ? state.favorites : state.history;
+
+      if (list.length === 0) {
+        drawerListContainer.innerHTML = `
+          <div class="py-12 text-center text-slate-500 text-xs">
+            <i class="fa-regular fa-folder-open text-2xl mb-2 block"></i>
+            No saved cards in this tab yet.
+          </div>
+        `;
+        return;
+      }
+
+      list.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'p-3 rounded-xl bg-slate-900/90 border border-mtgBorder hover:border-slate-600 transition flex items-center justify-between gap-3 text-xs';
+
+        if (item.type === 'commander') {
+          const c = item.card;
+          div.innerHTML = `
+            <div class="truncate flex-1">
+              <span class="text-[10px] uppercase font-bold text-amber-400 block">Commander</span>
+              <span class="font-semibold text-slate-200 block truncate">${c.name}</span>
+              <span class="text-[10px] text-slate-400 font-mono">${c.mana_cost || ''}</span>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button class="load-item-btn px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 transition" title="Load Card">
+                <i class="fa-solid fa-arrow-turn-up text-xs"></i>
+              </button>
+              ${state.activeTab === 'favorites' ? `
+                <button class="delete-item-btn p-1.5 rounded-lg text-slate-500 hover:text-rose-400 transition" title="Delete">
+                  <i class="fa-solid fa-trash text-xs"></i>
+                </button>
+              ` : ''}
+            </div>
+          `;
+          div.querySelector('.load-item-btn').addEventListener('click', () => {
+            setFormatMode('commander');
+            renderCommanderDisplay(c);
+            closeDrawer();
+          });
+        } else {
+          const pw = item.planeswalker;
+          const sp = item.spell;
+          div.innerHTML = `
+            <div class="truncate flex-1">
+              <span class="text-[10px] uppercase font-bold text-purple-400 block">Oathbreaker Pair</span>
+              <span class="font-semibold text-purple-200 block truncate">${pw.name}</span>
+              <span class="text-[11px] text-cyan-300 block truncate">+ ${sp.name}</span>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button class="load-item-btn px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-purple-300 transition" title="Load Pair">
+                <i class="fa-solid fa-arrow-turn-up text-xs"></i>
+              </button>
+              ${state.activeTab === 'favorites' ? `
+                <button class="delete-item-btn p-1.5 rounded-lg text-slate-500 hover:text-rose-400 transition" title="Delete">
+                  <i class="fa-solid fa-trash text-xs"></i>
+                </button>
+              ` : ''}
+            </div>
+          `;
+          div.querySelector('.load-item-btn').addEventListener('click', () => {
+            setFormatMode('oathbreaker');
+            renderOathbreakerDisplay(pw, sp);
+            closeDrawer();
+          });
+        }
+
+        const delBtn = div.querySelector('.delete-item-btn');
+        if (delBtn) {
+          delBtn.addEventListener('click', () => {
+            state.favorites.splice(index, 1);
+            localStorage.setItem('mtg_rolls_favorites', JSON.stringify(state.favorites));
+            updateCounts();
+            renderDrawerList();
+            updateFavoriteButtonUI();
+          });
+        }
+
+        drawerListContainer.appendChild(div);
+      });
+    }
+
+    document.querySelectorAll('.mana-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const col = btn.getAttribute('data-color');
+        if (state.selectedColors.has(col)) {
+          state.selectedColors.delete(col);
+          btn.classList.remove('active');
+        } else {
+          state.selectedColors.add(col);
+          btn.classList.add('active');
+        }
+        playDiceSound();
+        buildScryfallQuery();
+      });
+    });
+
+    document.querySelectorAll('.logic-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.logic-btn').forEach(b => {
+          b.classList.remove('active-logic');
+          b.className = 'logic-btn py-1.5 rounded-lg font-medium text-center transition text-slate-400 hover:text-slate-200';
+        });
+        btn.classList.add('active-logic');
+        btn.className = 'logic-btn active-logic py-1.5 rounded-lg font-medium text-center transition';
+        state.colorLogic = btn.getAttribute('data-logic');
+        playDiceSound();
+        buildScryfallQuery();
+      });
+    });
+
+    const colorCountFilter = document.getElementById('colorCountFilter');
+    if (colorCountFilter) colorCountFilter.addEventListener('change', (e) => { state.colorCount = e.target.value; buildScryfallQuery(); });
+
+    const commanderTypeFilter = document.getElementById('commanderTypeFilter');
+    if (commanderTypeFilter) commanderTypeFilter.addEventListener('change', (e) => { state.commanderType = e.target.value; buildScryfallQuery(); });
+
+    const spellTypeFilter = document.getElementById('spellTypeFilter');
+    if (spellTypeFilter) spellTypeFilter.addEventListener('change', (e) => { state.oathSpellType = e.target.value; });
+
+    const budgetFilter = document.getElementById('budgetFilter');
+    if (budgetFilter) budgetFilter.addEventListener('change', (e) => { state.budgetOnly = e.target.checked; buildScryfallQuery(); });
+
+    const excludeUnsets = document.getElementById('excludeUnsets');
+    if (excludeUnsets) excludeUnsets.addEventListener('change', (e) => { state.excludeUnsets = e.target.checked; buildScryfallQuery(); });
+
+    if (resetFiltersBtn) {
+      resetFiltersBtn.addEventListener('click', () => {
+        state.selectedColors.clear();
+        document.querySelectorAll('.mana-chip').forEach(b => b.classList.remove('active'));
+        state.colorLogic = 'exact';
+        document.querySelectorAll('.logic-btn').forEach(b => {
+          b.classList.remove('active-logic');
+          b.className = 'logic-btn py-1.5 rounded-lg font-medium text-center transition text-slate-400 hover:text-slate-200';
+        });
+        const firstLogic = document.querySelector('.logic-btn[data-logic="exact"]');
+        if (firstLogic) {
+          firstLogic.classList.add('active-logic');
+          firstLogic.className = 'logic-btn active-logic py-1.5 rounded-lg font-medium text-center transition';
+        }
+        if (colorCountFilter) colorCountFilter.value = 'any';
+        if (commanderTypeFilter) commanderTypeFilter.value = 'any';
+        if (spellTypeFilter) spellTypeFilter.value = 'any';
+        if (budgetFilter) budgetFilter.checked = false;
+        if (excludeUnsets) excludeUnsets.checked = true;
+        state.colorCount = 'any';
+        state.commanderType = 'any';
+        state.oathSpellType = 'any';
+        state.budgetOnly = false;
+        state.excludeUnsets = true;
+        buildScryfallQuery();
+        showToast('Filters reset.');
+      });
+    }
+
+    if (exportModalTriggerBtn) exportModalTriggerBtn.addEventListener('click', openExportModal);
+    if (closeExportModalBtn) closeExportModalBtn.addEventListener('click', closeExportModal);
+    if (exportModalBackdrop) exportModalBackdrop.addEventListener('click', closeExportModal);
+
+    const cleanExportToggle = document.getElementById('cleanExportToggle');
+    if (cleanExportToggle) {
+      cleanExportToggle.addEventListener('change', () => {
+        exportDeckTextarea.value = generateDeckExportContent(state.exportFormat);
+      });
+    }
+
+    document.querySelectorAll('.export-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.export-tab').forEach(t => {
+          t.classList.remove('active-tab');
+          t.className = 'export-tab flex-1 py-2 rounded-lg font-medium text-center transition text-slate-400 hover:text-slate-200';
+        });
+        tab.classList.add('active-tab');
+        tab.className = 'export-tab active-tab flex-1 py-2 rounded-lg font-medium text-center transition';
+        state.exportFormat = tab.getAttribute('data-format');
+        exportDeckTextarea.value = generateDeckExportContent(state.exportFormat);
+      });
+    });
+
+    if (copyDeckToClipboardBtn) {
+      copyDeckToClipboardBtn.addEventListener('click', () => {
+        copyToClipboard(exportDeckTextarea.value, 'Decklist copied to clipboard!');
+      });
+    }
+
+    if (downloadDeckFileBtn) {
+      downloadDeckFileBtn.addEventListener('click', () => {
+        const text = exportDeckTextarea.value;
+        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${state.format === 'commander' ? 'commander' : 'oathbreaker'}_decklist.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Downloaded .txt decklist!');
+      });
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMsg');
+      toastMsg.textContent = msg;
+      toast.classList.remove('opacity-0', 'translate-y-20');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'translate-y-20');
+      }, 2500);
+    }
+
+    function openDrawer() {
+      drawer.classList.remove('translate-x-full');
+      drawerBackdrop.classList.remove('hidden');
+      renderDrawerList();
+    }
+
+    function closeDrawer() {
+      drawer.classList.add('translate-x-full');
+      drawerBackdrop.classList.add('hidden');
+    }
+
+    function copyToClipboard(text, successMsg) {
+      const tempInput = document.createElement('textarea');
+      tempInput.value = text;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempInput);
+      showToast(successMsg);
+    }
+
+    modeCommanderBtn.addEventListener('click', () => setFormatMode('commander'));
+    modeOathbreakerBtn.addEventListener('click', () => setFormatMode('oathbreaker'));
+
+    randomizeBtn.addEventListener('click', () => {
+      if (state.format === 'commander') fetchRandomCommander();
+      else fetchRandomOathbreakerPair();
+    });
+
+    rerollOathbreakerOnlyBtn.addEventListener('click', rerollOathbreakerOnly);
+    rerollSpellOnlyBtn.addEventListener('click', rerollSignatureSpellOnly);
+
+    retryBroadBtn.addEventListener('click', () => {
+      resetFiltersBtn.click();
+      if (state.format === 'commander') fetchRandomCommander();
+      else fetchRandomOathbreakerPair();
+    });
+
+    copyShareBtn.addEventListener('click', () => {
+      if (!state.currentCard) return;
+      copyToClipboard(`${state.currentCard.name} - ${state.currentCard.scryfall_uri}`, 'Commander copied to clipboard!');
+    });
+
+    copyShareOathBtn.addEventListener('click', () => {
+      if (!state.currentOathPair) return;
+      const text = `Oathbreaker: ${state.currentOathPair.planeswalker.name}\nSignature Spell: ${state.currentOathPair.spell.name}`;
+      copyToClipboard(text, 'Oathbreaker pair copied to clipboard!');
+    });
+
+    toggleFavoriteBtn.addEventListener('click', toggleFavorite);
+    toggleFavoriteOathBtn.addEventListener('click', toggleFavorite);
+
+    soundToggleBtn.addEventListener('click', () => {
+      state.soundEnabled = !state.soundEnabled;
+      soundIcon.className = state.soundEnabled ? 'fa-solid fa-volume-high text-amber-400' : 'fa-solid fa-volume-xmark text-slate-500';
+      showToast(state.soundEnabled ? 'Audio feedback enabled' : 'Audio feedback muted');
+    });
+
+    drawerToggleBtn.addEventListener('click', openDrawer);
+    closeDrawerBtn.addEventListener('click', closeDrawer);
+    drawerBackdrop.addEventListener('click', closeDrawer);
+
+    tabFavorites.addEventListener('click', () => {
+      state.activeTab = 'favorites';
+      tabFavorites.className = 'flex-1 py-3 text-center border-b-2 border-amber-400 text-amber-300';
+      tabHistory.className = 'flex-1 py-3 text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200';
+      renderDrawerList();
+    });
+
+    tabHistory.addEventListener('click', () => {
+      state.activeTab = 'history';
+      tabHistory.className = 'flex-1 py-3 text-center border-b-2 border-amber-400 text-amber-300';
+      tabFavorites.className = 'flex-1 py-3 text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200';
+      renderDrawerList();
+    });
+
+    clearListBtn.addEventListener('click', () => {
+      if (state.activeTab === 'favorites') {
+        state.favorites = [];
+        localStorage.setItem('mtg_rolls_favorites', '[]');
+      } else {
+        state.history = [];
+        localStorage.setItem('mtg_rolls_history', '[]');
+      }
+      updateCounts();
+      renderDrawerList();
+      updateFavoriteButtonUI();
+      showToast('Cleared list.');
+    });
+
+    window.onload = () => {
+      applyTheme(state.activeTheme);
+      updateCounts();
+      buildScryfallQuery();
+      rollNewChallenge(true);
+      fetchRandomCommander();
+    };
+  </script>
+</body>
+</html>
